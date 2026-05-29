@@ -1,56 +1,65 @@
-# Welcome to your Expo app 👋
+# FinFlow mobile app
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Pseudo code
 
-## Get started
+### US-00 — User Authentication
 
-1. Install dependencies
+```typescript
+FUNCTION onAppLaunch() {
+   TOKEN = getSecureStorage("auth_token")
 
-   ```bash
-   npm install
-   ```
+   IF (TOKEN exists && IS_VALID(TOKEN)) {
+      SET_AUTH_STATE(true)
+      NAVIGATE("dashboardScreen")
+   } ELSE {
+      SET_AUTH_STATE(false)
+      NAVIGATE("loginScreen")
+   }
+}
 
-2. Start the app
+FUNCTION handleLogin(EMAIL, PWD) {
+   IF (EMAIL is null || PWD is null) {
+      SHOW_FIELD_ERROR("Required field")
+      RETURN
+   }
 
-   ```bash
-   npx expo start
-   ```
+   SHOW_LOADING_SPINNER()
+   RESPONSE = HTTP_POST(API_URL + "/auth/login", { email, password })
+   HIDE_LOADING_SPINNER()
 
-In the output, you'll find options to open the app in a
+   IF (NETWORK_ERROR) {
+      SHOW_ERROR_ALERT("No internet connection.")
+   } ELSE IF (RESPONSE.status == 200) {
+      SAVE_SECURE_STORAGE("auth_token", RESPONSE.body.token)
+      SET_AUTH_STATE(true)
+      NAVIGATE("dashboardScreen")
+   } ELSE {
+      SHOW_ERROR_ALERT("Login failed: " + RESPONSE.error_msg)
+   }
+}
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+FUNCTION handleRegister(EMAIL, PWD, REPEATED_PWD) {
+   IF (EMAIL is not valid format) {
+      SHOW_FIELD_ERROR("Invalid email.")
+      RETURN
+   }
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+   IF (PWD != REPEATED_PWD) {
+      SHOW_FIELD_ERROR("Passwords don't match.")
+      RETURN
+   }
 
-## Get a fresh project
+   SHOW_LOADING_SPINNER()
+   RESPONSE = HTTP_POST(API_URL + "/auth/register", { email, password })
+   HIDE_LOADING_SPINNER()
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+   IF (NETWORK_ERROR) {
+      SHOW_ERROR_ALERT("No internet connection.")
+   } ELSE IF (RESPONSE.status == 201) {
+      SHOW_SUCCESS_MODAL("Registration successful!")
+      NAVIGATE("loginScreen")
+   } ELSE {
+      SHOW_ERROR_ALERT("Registration failed: " + RESPONSE.error_msg)
+   }
+}
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

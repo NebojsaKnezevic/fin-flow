@@ -1,17 +1,15 @@
 import { Text, View, StyleSheet } from "react-native";
+import { Platform } from "react-native";
+import * as Device from "expo-device";
+import HomeScreen from "@/app/home-screen";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+
 
 export default function Index() {
   return (
-    <View style={styles.container}>
-      <Text>Test React Native</Text>
-    </View>
+   
+  
+      <HomeScreen />
+    
   );
 }

@@ -1,159 +1,65 @@
-# Turborepo starter
+# FinFlow App
 
-This Turborepo starter is maintained by the Turborepo core team.
+This application is supposed to allow easy fin data gathering, primarily by taking pictures of the eceipts. Dissecting the data via some AI API and producing 1 unified JSON object for further analysis. Afterwards, it allows for tracking of the expenses on daily, weekly, monthly, quarterly, and yearly terms. Also, it may have the ability to notify the user if he spends too much money or less per specific period. This would allow users to better plan their budget.
 
-## Using this example
+**The most important part is to make super easy, fast and convinient information gathering.**
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
-```
+## Tech Stack
 
-## What's inside?
+- **Monorepo Management:** Turborepo
+- **Mobile:** Expo (React Native) / TypeScript
+- **Backend:** Node.js / Express / TypeScript
+- **Database:** PostgreSQL
+- **AI Integration:** (TBD — Claude / GPT / Gemini)
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+## User Stories
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### US-00 — User Authentication
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+As a user, I want to create an account and log in so that my financial data is securely stored.
 
-### Utilities
+- **AC:** User can register with an email and password.
+- **AC:** User can log in to persist their session across app restarts.
+- **AC:** Protected routes/screens (Dashboard, Camera) are inaccessible without a valid session.
 
-This Turborepo has some additional tools already setup for you:
+### US-01 — Camera Capture
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+As a user, I want to photograph a receipt so that the app automatically extracts vendor, date, amount, and category via AI.
 
-### Build
+- **Extracted data is reviewable and editable before saving.**
 
-To build all apps and packages, run the following command:
+### US-02 — Voice Input
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+As a user, I want to dictate an expense (e.g., "coffee 350 dinara") so that I can log it quickly without typing.
 
-```sh
-cd my-turborepo
-turbo build
-```
+- **Extracted data is reviewable and editable before saving.**
 
-Without global `turbo`, use your package manager:
+### US-03 — Manual Input
 
-```sh
-cd my-turborepo
-npx turbo build
-npm dlx turbo build
-npm exec turbo build
-```
+As a user, I want to manually enter expense details via a form as a fallback input method.
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### US-04 — Expense Timeline
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+As a user, I want to filter expenses by day, week, month, quarter, and year so that I can identify spending patterns.
 
-```sh
-turbo build --filter=docs
-```
+### US-05 — Budget Alerts
 
-Without global `turbo`:
+As a user, I want to set a monthly budget per category so that I get notified at 80% and 100% usage.
 
-```sh
-npx turbo build --filter=docs
-npm exec turbo build --filter=docs
-npm exec turbo build --filter=docs
-```
+- **AC:** Notifications work even when the app is closed.
 
-### Develop
+### US-06 — Dashboard
 
-To develop all apps and packages, run the following command:
+As a user, I want a home screen showing an instant financial overview.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+- **AC:** Dashboard displays:
+  - Total spent this month vs budget
+  - Top 3 spending categories
+  - Recent transactions
+  - Ect.
 
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-npm exec turbo dev
-npm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-npm exec turbo dev --filter=web
-npm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-npm exec turbo login
-npm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-npm exec turbo link
-npm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+---
