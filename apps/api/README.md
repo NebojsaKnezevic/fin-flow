@@ -25,6 +25,11 @@ FUNCTION register(REQ_BODY) {
    IF(PWD.length is not valid format)
       RETURN RESPONSE(400, "Invalid password format.")
 
+   EXISTING_USER = DB_QUERY('Check if it exists');
+   IF(EXISTING_USER){
+      RETURN RESPONSE(409, "Email alreadu in use.");
+   }
+
    HASHED_PWD = HASH_FUNCTION(PWD)
 
    NEW_USER = DB_QUERY(
