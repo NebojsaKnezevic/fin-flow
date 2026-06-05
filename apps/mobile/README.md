@@ -1,10 +1,22 @@
 # FinFlow mobile app
 
+## User Flow Diagram
+
+```mermaid
+graph TD
+   A[App start] --> B{Check for the token.}
+   B -- Y --> C[Dashboard Screen]
+   B -- N --> D[Login Screen]
+   D -->|Successfull login| C
+   D -->|Click on registration| E[Register Screen]
+   E -->|Successfull registration| D
+```
+
 ## Pseudo code
 
 ### US-00 — User Authentication
 
-```typescript
+````typescript
 FUNCTION onAppLaunch() {
    TOKEN = getSecureStorage("auth_token")
 
@@ -50,16 +62,31 @@ FUNCTION handleRegister(EMAIL, PWD, REPEATED_PWD) {
    }
 
    SHOW_LOADING_SPINNER()
-   RESPONSE = HTTP_POST(API_URL + "/auth/register", { email, password })
-   HIDE_LOADING_SPINNER()
+   RESPONSE = HTTP_POST(API_URL + "/auth/register", { email, password })### User Flow Diagram
 
-   IF (NETWORK_ERROR) {
-      SHOW_ERROR_ALERT("No internet connection.")
-   } ELSE IF (RESPONSE.status == 201) {
-      SHOW_SUCCESS_MODAL("Registration successful!")
-      NAVIGATE("loginScreen")
-   } ELSE {
-      SHOW_ERROR_ALERT("Registration failed: " + RESPONSE.error_msg)
-   }
+```mermaid
+graph TD
+   A[App start] --> B{Check for the token.}
+   B -- Da --> C[Dashboard Screen]
+   B -- Ne --> D[Login Screen]
+   D -->|Successfull login| C
+   D -->|Click on registration| E[Register Screen]
+   E -->|Successfull registration| D
+````
+
+HIDE_LOADING_SPINNER()
+
+IF (NETWORK_ERROR) {
+SHOW_ERROR_ALERT("No internet connection.")
+} ELSE IF (RESPONSE.status == 201) {
+SHOW_SUCCESS_MODAL("Registration successful!")
+NAVIGATE("loginScreen")
+} ELSE {
+SHOW_ERROR_ALERT("Registration failed: " + RESPONSE.error_msg)
 }
+}
+
+```
+
+
 ```
