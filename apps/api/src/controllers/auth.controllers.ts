@@ -59,10 +59,6 @@ export async function loginController(req: Request, res: Response) {
     .limit(1)
     .then((res) => res[0]);
 
-  if (!user) {
-    throw new AppError(401, "Invalid email or password.");
-  }
-
   const isValidPwd = bcrypt.compareSync(password, user.password);
 
   if (!isValidPwd) {
@@ -70,13 +66,13 @@ export async function loginController(req: Request, res: Response) {
   }
 
   const JWT_SECRET = process.env.JWT_SECRET || "asdasdasdadas@@@@";
-  const token = jwt.sign(user, JWT_SECRET, { expiresIn: "1d" });
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 24 * 60 * 60 * 1000,
+  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+    expiresIn: "1d",
   });
 
-  res.status(200).json(user as UserWithId);
+  res.status(200).json({
+    message: "success",
+    token,
+    user: { id: user.id, email: user.email },
+  });
 }
