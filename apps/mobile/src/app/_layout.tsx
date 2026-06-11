@@ -1,11 +1,14 @@
 import { Stack } from 'expo-router';
+import { PaperProvider } from 'react-native-paper';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export default function RootLayout() {
+
+export default function Layout() {
   return (
-    <Stack
-      screenOptions={{
-        headerTitle: 'MacroZone',
-        headerShown: false      }}
-    />
+    <QueryClientProvider client={new QueryClient()}>
+    <PaperProvider>
+      <Stack/>
+    </PaperProvider>
+    </QueryClientProvider>
   );
 }
