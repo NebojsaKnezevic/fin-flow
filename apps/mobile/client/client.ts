@@ -2,7 +2,7 @@ import axios from "axios";
 import { router } from "expo-router";
 
 export const apiClient = axios.create({
-  baseURL: "BE URL",
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
