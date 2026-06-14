@@ -1,15 +1,6 @@
-import { Text, View, StyleSheet } from "react-native";
-import { Platform } from "react-native";
-import * as Device from "expo-device";
-import HomeScreen from "@/app/home-screen";
+import { Redirect } from "expo-router"
 
 
-
-export default function Index() {
-  return (
-   
-  
-      <HomeScreen />
-    
-  );
+export default function Index(){
+    return <Redirect href="/login" />
 }
