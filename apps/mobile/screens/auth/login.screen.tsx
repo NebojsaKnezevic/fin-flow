@@ -81,6 +81,7 @@ export default function LoginScreen() {
 
         <Text style={styles.error}>
           {error === "" ? "" : JSON.stringify(error)}
+          {JSON.stringify(user)}
         </Text>
 
         <TextInput
@@ -104,7 +105,7 @@ export default function LoginScreen() {
         <TextInput
           label="Password"
           value={password}
-          onChangeText={setPwd}
+          onChangeText={(s) => setPwd(s)}
           mode="outlined"
           secureTextEntry={secureText}
           autoCapitalize="none"
