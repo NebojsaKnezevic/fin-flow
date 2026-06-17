@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { View, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { TextInput, Button, Text, HelperText } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "../../client/client";
 import { AxiosError } from "axios";
 import useLoginScreenStyles from "./styles";
+import { Notify } from "../../helpers/toast.helper";
 
 export default function LoginScreen() {
   const styles = useLoginScreenStyles();
@@ -15,7 +16,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPwd] = useState("");
   const [secureText, setSecureText] = useState(true);
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
 
   const setAuth = useAuthStore((state) => state.setAuth);
   const user = useAuthStore((s) => s.user);
@@ -28,37 +29,29 @@ export default function LoginScreen() {
     onSuccess: (data) => {
       setAuth(data.user, data.token);
       // setError(JSON.stringify(user));
+      Notify.success("Welcome back! 👋");
     },
     onError: (error: AxiosError) => {
-      const msg = JSON.stringify(error.response?.data);
       // setError(msg ?? JSON.stringify(error));
+      const serverMessage = (error.response?.data as any)?.message || error.message;
+      Notify.error(serverMessage, "Login Failed");
     },
   });
 
-  const id = useRef(0);
-
   const handleLogin = () => {
-    setError("");
-
-    clearTimeout(id.current);
-
-    id.current = setTimeout(() => {
-      setError("");
-    }, 5000);
-
     if (!email.trim() || !password.trim()) {
-      setError("All fields are required");
+      Notify.error("All fields are required");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError("Invalid email address");
+      Notify.error("Invalid email address");
       return;
     }
 
     if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
+      Notify.error("Password must be at least 8 characters long");
       return;
     }
 
@@ -79,10 +72,10 @@ export default function LoginScreen() {
           FinFlow
         </Text>
 
-        <Text style={styles.error}>
+        {/* <Text style={styles.error}>
           {error === "" ? "" : JSON.stringify(error)}
           {JSON.stringify(user)}
-        </Text>
+        </Text> */}
 
         <TextInput
           label="Email address"
@@ -118,7 +111,13 @@ export default function LoginScreen() {
           style={styles.input}
         />
 
-        <Button mode="contained" onPress={handleLogin} style={styles.button}>
+        <Button 
+          mode="contained" 
+          onPress={handleLogin} 
+          loading={loginMutation.isPending}
+          disabled={loginMutation.isPending}
+          style={styles.button}
+        >
           Sign in
         </Button>
 
