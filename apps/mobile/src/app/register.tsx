@@ -1,5 +1,5 @@
 
-import RegisterScreen from "../../screens/register.screen";
+import RegisterScreen from "../../screens/auth/register.screen";
 
 export default function Register() {
   return (

@@ -15,6 +15,7 @@ axios.interceptors.response.use(
   },
   function (error) {
     if (error.response && error.response.status === 401) {
+      console.log(error);
       router.replace("/login");
     }
     return Promise.reject(error);

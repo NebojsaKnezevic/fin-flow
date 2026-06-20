@@ -3,6 +3,39 @@ import { PaperProvider, MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useThemeStore } from '../../store/theme.store';
 import { useMemo } from 'react';
+import Toast, { BaseToast, ErrorToast, ToastConfig } from 'react-native-toast-message'
+import { Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
+
+const toastConfig: ToastConfig = {
+  success: (props) => (
+    <BaseToast
+      {...props}
+      style={{ 
+        borderLeftColor: '#047857', 
+        width: width * 0.95,       
+        borderRadius: 10,
+      }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{ fontSize: 16, fontWeight: 'bold' }}
+      text2Style={{ fontSize: 14, color: '#666' }}
+    />
+  ),
+  error: (props) => (
+    <ErrorToast
+      {...props}
+      style={{ 
+        borderLeftColor: '#ef4444',
+        width: width * 0.95,        
+        borderRadius: 10,
+      }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{ fontSize: 16, fontWeight: 'bold' }}
+      text2Style={{ fontSize: 14, color: '#666' }}
+    />
+  )
+};
 
 const fintechLightTheme = {
   ...MD3LightTheme,
@@ -46,6 +79,8 @@ export default function Layout() {
     <QueryClientProvider client={queryClient}>
     <PaperProvider theme={currentTheme}>
       <Stack screenOptions={{headerShown: false}}/>
+
+      <Toast config={toastConfig}/>
     </PaperProvider>
     </QueryClientProvider>
   );
