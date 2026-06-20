@@ -1,6 +1,5 @@
-import { Redirect } from "expo-router"
+import AuthBootstrap from "../../screens/auth/bootstrap.screen";
 
-
-export default function Index(){
-    return <Redirect href="/login" />
+export default function Index() {
+  return <AuthBootstrap />;
 }

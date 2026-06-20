@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import * as SecureStore from "expo-secure-store";
 
 interface user {
   id: number;
@@ -16,7 +17,10 @@ export const useAuthStore = create<AuthState>((set) => {
   return {
     user: null,
     token: null,
-    setAuth: (user, token) => set({ user, token }),
+    setAuth: async (user, token) => {
+      await SecureStore.setItemAsync("user_token", token);
+      set({ user, token });
+    },
     clearAuth: () => set({ user: null, token: null }),
   };
 });

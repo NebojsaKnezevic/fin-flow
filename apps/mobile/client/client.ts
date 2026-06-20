@@ -1,5 +1,6 @@
 import axios from "axios";
 import { router } from "expo-router";
+import { Notify } from "../helpers/toast.helper";
 
 export const apiClient = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
@@ -11,11 +12,12 @@ export const apiClient = axios.create({
 
 axios.interceptors.response.use(
   function (response) {
+    // Notify.success(JSON.stringify(response));
     return response;
   },
   function (error) {
     if (error.response && error.response.status === 401) {
-      console.log(error);
+      Notify.error(JSON.stringify(error));
       router.replace("/login");
     }
     return Promise.reject(error);

@@ -1,7 +1,9 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { pgTable, text, uuid, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
+extendZodWithOpenApi(z);
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),

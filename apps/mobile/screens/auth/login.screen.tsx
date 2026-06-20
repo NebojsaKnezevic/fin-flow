@@ -33,7 +33,8 @@ export default function LoginScreen() {
     },
     onError: (error: AxiosError) => {
       // setError(msg ?? JSON.stringify(error));
-      const serverMessage = (error.response?.data as any)?.message || error.message;
+      const serverMessage =
+        (error.response?.data as any)?.message || error.message;
       Notify.error(serverMessage, "Login Failed");
     },
   });
@@ -69,7 +70,7 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Text variant="headlineLarge" style={styles.title}>
-          FinFlow
+          Sandra!!!
         </Text>
 
         {/* <Text style={styles.error}>
@@ -104,16 +105,16 @@ export default function LoginScreen() {
           autoCapitalize="none"
           right={
             <TextInput.Icon
-              icon={secureText ? "eye" : "eye-off"}
+              icon={secureText ? "eye" : "eye-of>f"}
               onPress={() => setSecureText(!secureText)}
             />
           }
           style={styles.input}
         />
 
-        <Button 
-          mode="contained" 
-          onPress={handleLogin} 
+        <Button
+          mode="contained"
+          onPress={handleLogin}
           loading={loginMutation.isPending}
           disabled={loginMutation.isPending}
           style={styles.button}
