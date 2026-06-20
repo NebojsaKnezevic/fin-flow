@@ -1,5 +1,6 @@
 import { Express, Request, Response } from "express";
 import authRoutes from "./auth.routes";
+import authMiddleware from "../middlewares/auth.middleware";
 
 export default function setRoutes(app: Express) {
   app.get("/", (req: Request, res: Response) => {

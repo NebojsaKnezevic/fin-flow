@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "description": "| Method | Route          | Description              | | ------ | -------------- | ------------------------ | | POST   | /auth/register | Register new user        | | POST   | /auth/login    | Login, returns JWT token |",
   "main": "index.js",
+  "exports": {
+    "./types": "./src/db/schemas/schema.ts"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "test": "vitest",
     "build": "tsc",
     "start": "node dist/index.js",
+    "android": "npx expo run:android",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
@@ -34,9 +38,10 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
+    "drizzle-zod": "^0.8.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.21.0",
-    "zod": "^3.25.76"
+    "zod": "4.4.3"
   }
 }
