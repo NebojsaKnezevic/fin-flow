@@ -3,7 +3,7 @@ import { registerSchema, loginSchema } from "../schemas/auth.schema";
 import bcrypt from "bcrypt";
 import db from "../db/db";
 import { eq } from "drizzle-orm";
-import { users, UserWithId } from "../db/schemas/users";
+import { users, UserWithId } from "../db/schemas/schema";
 import { AppError } from "../errors/app.error";
 import jwt from "jsonwebtoken";
 
@@ -11,8 +11,8 @@ export async function registerController(req: Request, res: Response) {
   const validation = registerSchema.safeParse(req.body);
 
   if (!validation.success) {
-    const errs = validation.error.errors;
-    throw new AppError(400, errs.map((e) => e.message).join(", "));
+    const errs = validation.error;
+    throw new AppError(400, errs.message);
   }
 
   const { email, password } = validation.data;
@@ -42,8 +42,8 @@ export async function loginController(req: Request, res: Response) {
   const validation = loginSchema.safeParse(req.body);
 
   if (!validation.success) {
-    const err = validation.error.errors;
-    throw new AppError(400, err[0].message);
+    const err = validation.error;
+    throw new AppError(400, err.message);
   }
 
   const { email, password } = validation.data;
