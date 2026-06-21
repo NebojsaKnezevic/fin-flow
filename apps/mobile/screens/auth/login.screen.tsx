@@ -30,6 +30,7 @@ export default function LoginScreen() {
       setAuth(data.user, data.token);
       // setError(JSON.stringify(user));
       Notify.success("Welcome back! 👋");
+      router.replace("/app");
     },
     onError: (error: AxiosError) => {
       // setError(msg ?? JSON.stringify(error));
@@ -70,7 +71,7 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Text variant="headlineLarge" style={styles.title}>
-          Sandra!!!
+          FinFlow
         </Text>
 
         {/* <Text style={styles.error}>

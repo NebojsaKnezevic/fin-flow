@@ -57,6 +57,9 @@ export const expenseSourceEnum = pgEnum("expense_source", [
   "voice",
 ]);
 
+export const expenseSourceSchema = z.enum(expenseSourceEnum.enumValues);
+export type ExpenseSource = z.infer<typeof expenseSourceSchema>;
+
 export const expenses = pgTable("expenses", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id")

@@ -8,7 +8,8 @@
       ],
       "@/assets/*": [
         "./assets/*"
-      ]
+      ],
+      "@api/schema": ["../api/src/db/schemas/schema.ts"]
     }
   },
   "include": [
