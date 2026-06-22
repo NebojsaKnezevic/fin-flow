@@ -82,3 +82,13 @@ export const expenses = pgTable("expenses", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const insertExpenseSchema = createInsertSchema(expenses).omit({
+  id: true,
+  userId: true,
+  source: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type Expenses = z.infer<typeof insertExpenseSchema>;

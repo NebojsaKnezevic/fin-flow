@@ -8,7 +8,7 @@ const InputsRoute = () => <InputScreen />;
 export default function App() {
   const [index, setIndex] = useState(0);
 
-  const [routes] = React.useState([
+  const [routes] = useState([
     {
       key: "Input",
       title: "Input",
