@@ -8,6 +8,13 @@
       "when": 1781977247337,
       "tag": "0000_rich_hitman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782230932196,
+      "tag": "0001_chubby_gamora",
+      "breakpoints": true
     }
   ]
 }

@@ -1,10 +1,8 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
   pgTable,
   text,
   uuid,
   timestamp,
-  integer,
   doublePrecision,
   pgEnum,
   serial,
@@ -44,7 +42,7 @@ export type UserWithId = z.infer<typeof userWithIdSchema>;
 export const expenseCategory = pgTable("expense_category", {
   id: serial("id").primaryKey(),
   category: text("category").notNull(),
-  testKolona: text("test_kolona"),
+  // testKolona: text("test_kolona"),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
 });
 
@@ -66,13 +64,13 @@ export const expenses = pgTable("expenses", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 
-  amount: doublePrecision("amount").notNull(),
+  totalAmount: doublePrecision("total_amount").notNull(),
   currency: text("currency").notNull().default("USD"),
   merchant: text("merchant"),
 
-  categoryId: integer("category_id")
-    .notNull()
-    .references(() => expenseCategory.id, { onDelete: "restrict" }),
+  // categoryId: integer("category_id")
+  //   .notNull()
+  //   .references(() => expenseCategory.id, { onDelete: "restrict" }),
 
   note: text("note"),
   source: expenseSourceEnum("source").notNull(),
@@ -92,3 +90,22 @@ export const insertExpenseSchema = createInsertSchema(expenses).omit({
 });
 
 export type Expenses = z.infer<typeof insertExpenseSchema>;
+
+// ==========================================
+// 4. EXPENSE ITEMS TABELA
+// ==========================================
+
+export const expenseItems = pgTable("expense_items", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  name: t.text().notNull(),
+  price: t.doublePrecision().notNull(),
+  quantity: t.doublePrecision().notNull(),
+  categoryId: t
+    .integer("category_id")
+    .notNull()
+    .references(() => expenseCategory.id, { onDelete: "restrict" }),
+  expenseId: t
+    .uuid("expense_id")
+    .notNull()
+    .references(() => expenses.id, { onDelete: "cascade" }),
+}));
