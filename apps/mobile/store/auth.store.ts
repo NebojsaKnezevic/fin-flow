@@ -1,15 +1,16 @@
 import { create } from "zustand";
 import * as SecureStore from "expo-secure-store";
+import { UserWithId } from "@api/schema";
 
-interface user {
-  id: number;
-  email: string;
-}
+// interface user {
+//   id: number;
+//   email: string;
+// }
 
 interface AuthState {
-  user: user | null;
+  user: UserWithId | null;
   token: string | null;
-  setAuth: (user: user, token: string) => void;
+  setAuth: (user: UserWithId, token: string) => void;
   clearAuth: () => void;
 }
 
