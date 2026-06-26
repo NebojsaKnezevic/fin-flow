@@ -59,7 +59,7 @@ export async function loginController(req: Request, res: Response) {
     .limit(1)
     .then((res) => res[0]);
 
-  // console.log(user);
+  console.log(user);
 
   if (!user) {
     throw new AppError(401, "Invalid email or password.");

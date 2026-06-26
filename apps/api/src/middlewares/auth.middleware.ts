@@ -8,7 +8,7 @@ import { UserWithId } from "../db/schemas/schema";
 declare global {
   namespace Express {
     interface Request {
-      user?: UserWithId;
+      user: UserWithId;
     }
   }
 }

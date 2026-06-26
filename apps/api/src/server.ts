@@ -14,9 +14,9 @@ function getLocalIpAddress() {
 }
 
 dotenv.config();
-const PORT = process.env.PORT || 5000;
+const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `\x1b[36m%s\x1b[0m`,
     `http://${getLocalIpAddress()}:${PORT} http://localhost:${PORT}`,

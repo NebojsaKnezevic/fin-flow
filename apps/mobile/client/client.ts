@@ -13,6 +13,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   async (config) => {
+    // console.log(config);
     try {
       const token = await SecureStore.getItemAsync("user_token");
       Notify.success(JSON.stringify(token));
@@ -42,6 +43,6 @@ apiClient.interceptors.response.use(
       Notify.error(JSON.stringify(error));
       router.replace("/login");
     }
-    return Promise.reject(error);
+    return Promise.reject(`axios` + error);
   },
 );

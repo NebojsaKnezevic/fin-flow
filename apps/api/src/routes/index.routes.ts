@@ -1,5 +1,6 @@
 import { Express, Request, Response } from "express";
 import authRoutes from "./auth.routes";
+import expenseRoutes from "./expense.routes";
 import authMiddleware from "../middlewares/auth.middleware";
 
 export default function setRoutes(app: Express) {
@@ -10,4 +11,5 @@ export default function setRoutes(app: Express) {
   });
 
   app.use("/auth", authRoutes);
+  app.use("/expenses", expenseRoutes);
 }

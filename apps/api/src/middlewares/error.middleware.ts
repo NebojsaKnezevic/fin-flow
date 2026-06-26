@@ -25,7 +25,8 @@ export function globalErrorHandler(
       error: err.message,
     });
   } else if (dbError) {
-    console.error("Database error:", err);
+    // console.error("Database error:", err);
+    //LOGGING - not implemented yet.
     res.status(500).json({
       error: "Database Error: " + err.message,
     });
