@@ -4,6 +4,7 @@ import InputTabs from "@/components/input/tabs.input";
 import InputForm from "@/components/input/form.input";
 import { insertExpenseSchema } from "@api/schema";
 import ExpenseList from "@/components/input/list.input";
+import Expense from "@/components/input/expense.input";
 
 export default function InputScreen() {
   const keys: string[] = Object.keys(insertExpenseSchema.shape);
@@ -15,13 +16,10 @@ export default function InputScreen() {
       </View>
 
       <ScrollView style={styles.content}>
-        <Text>Test Input Screen</Text>
-        {/* {keys.map((k) => {
-          return (
-            <InputForm label={k[0].toUpperCase() + k.substring(1, k.length)} />
-          );
-        })} */}
-        <ExpenseList />
+        {/* <Text variant="headlineLarge">Welcome back! </Text> */}
+
+        {/* <ExpenseList /> */}
+        <Expense />
       </ScrollView>
     </View>
   );

@@ -60,6 +60,7 @@ export type ExpenseSource = z.infer<typeof expenseSourceSchema>;
 
 export const expenses = pgTable("expenses", {
   id: uuid("id").defaultRandom().primaryKey(),
+  name: text().default(""),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -81,15 +82,15 @@ export const expenses = pgTable("expenses", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const insertExpenseSchema = createInsertSchema(expenses).omit({
-  id: true,
+export const insertExpenseSchema = createInsertSchema(expenses).pick({
+  name: true,
   userId: true,
   source: true,
-  createdAt: true,
-  updatedAt: true,
+  note: true,
+  occuredAt: true,
 });
 
-export type Expenses = z.infer<typeof insertExpenseSchema>;
+export type InsertExpense = z.infer<typeof insertExpenseSchema>;
 
 // ==========================================
 // 4. EXPENSE ITEMS TABELA
@@ -97,7 +98,8 @@ export type Expenses = z.infer<typeof insertExpenseSchema>;
 
 export const expenseItems = pgTable("expense_items", (t) => ({
   id: t.uuid().defaultRandom().primaryKey(),
-  name: t.text().notNull(),
+  //IZBACICU NAME!!!!!!!!!
+  // name: t.text().notNull(),
   price: t.doublePrecision().notNull(),
   quantity: t.doublePrecision().notNull(),
   categoryId: t
@@ -109,3 +111,10 @@ export const expenseItems = pgTable("expense_items", (t) => ({
     .notNull()
     .references(() => expenses.id, { onDelete: "cascade" }),
 }));
+
+export const insertExpenseItemSchema = createInsertSchema(expenseItems).omit({
+  id: true,
+  expenseId: true,
+});
+
+export type InsertExpenseItem = z.infer<typeof insertExpenseItemSchema>;
