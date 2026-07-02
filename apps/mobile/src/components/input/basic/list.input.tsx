@@ -10,7 +10,7 @@ import {
 import InputForm from "./form.input";
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { apiClient } from "../../../client/client";
+import { apiClient } from "../../../../client/client";
 
 const fetchExpenses = async ({ pageParam = 1 }) => {
   const { data } = await apiClient.get(`/expenses?page=${pageParam}&limit=10`);

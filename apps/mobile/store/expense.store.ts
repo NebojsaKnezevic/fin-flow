@@ -7,6 +7,7 @@ interface ExpenseState {
   setExpanse: (e: InsertExpense) => void;
   addExpenseItem: (ei: InsertExpenseItem) => void;
   removeExpenseItem: (index: number) => void;
+  updateExpenseItem: (index: number, item: InsertExpenseItem) => void;
 }
 
 export const useExpenseStore = create<ExpenseState>((set) => {
@@ -29,5 +30,13 @@ export const useExpenseStore = create<ExpenseState>((set) => {
       set((s) => ({
         expenseItems: s.expenseItems.filter((_, i) => index !== i),
       })),
+
+    updateExpenseItem: (index: number, item: InsertExpenseItem) =>
+      set((s) => {
+        s.expenseItems[index] = item;
+        return {
+          expenseItems: [...s.expenseItems],
+        };
+      }),
   };
 });

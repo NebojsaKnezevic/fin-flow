@@ -1,10 +1,10 @@
 import { Text } from "react-native-paper";
 import { View, StyleSheet, ScrollView } from "react-native";
 import InputTabs from "@/components/input/tabs.input";
-import InputForm from "@/components/input/form.input";
+import InputForm from "@/components/input/basic/form.input";
 import { insertExpenseSchema } from "@api/schema";
-import ExpenseList from "@/components/input/list.input";
-import Expense from "@/components/input/expense.input";
+import ExpenseList from "@/components/input/basic/list.input";
+import Expense from "@/components/input/basic/expense.input";
 
 export default function InputScreen() {
   const keys: string[] = Object.keys(insertExpenseSchema.shape);

@@ -1,23 +1,63 @@
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import ExpenseItems from "./expense-item.input";
-import { useExpenseStore } from "../../../store/expense.store";
+import { useExpenseStore } from "../../../../store/expense.store";
 import { InsertExpense } from "@api/schema";
 import { Text, TextInput, useTheme } from "react-native-paper";
 import CustomInputField from "./custom-field.input";
+import { AppTheme } from "@/app/_layout";
 
 export default function Expense() {
-  const theme = useTheme();
+  const theme: AppTheme = useTheme();
   const newExpense: InsertExpense = useExpenseStore((s) => s.expense);
+  const setNewExpense = useExpenseStore((s) => s.setExpanse);
+
+  const items = useExpenseStore((s) => s.expenseItems);
+
+  React.useEffect(() => {
+    const total = items.reduce((acc, current) => {
+      const price = Number(current.price) || 0;
+      const quantity = Number(current.quantity) || 0;
+      return acc + price * quantity;
+    }, 0);
+
+    setNewExpense({ ...newExpense, totalAmount: total });
+  }, [items]);
   return (
     <ScrollView
       style={{ ...styles.container, backgroundColor: theme.colors.background }}
       contentContainerStyle={styles.centerContent}
     >
-      <CustomInputField label="Receipt Name:" />
-      <ExpenseItems />
-      <CustomInputField label="Total:" />
-      <CustomInputField label="Note:" />
+      {/* <Text>{JSON.stringify(newExpense)}</Text> */}
+      {/* <Text>{JSON.stringify(newExpense.)}</Text> */}
+      <CustomInputField
+        label="Receipt Name:"
+        val={newExpense.name}
+        setValue={(val) => setNewExpense({ ...newExpense, name: val })}
+      />
+      <CustomInputField
+        label="Merchant:"
+        val={newExpense.merchant}
+        setValue={(val) => setNewExpense({ ...newExpense, merchant: val })}
+      />
+
+      <ExpenseItems
+        setTotalAmount={(val: number) =>
+          setNewExpense({ ...newExpense, totalAmount: val })
+        }
+      />
+
+      <CustomInputField
+        label="Currency:"
+        val={newExpense.currency}
+        setValue={(val) => setNewExpense({ ...newExpense, currency: val })}
+      />
+      <CustomInputField label="Total:" val={newExpense.totalAmount} />
+      <CustomInputField
+        label="Note:"
+        val={newExpense.note}
+        setValue={(val) => setNewExpense({ ...newExpense, note: val })}
+      />
       <CustomInputField
         label="Occured At:"
         val={newExpense.occuredAt.toLocaleDateString()}

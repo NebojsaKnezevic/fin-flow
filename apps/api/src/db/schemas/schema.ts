@@ -65,7 +65,7 @@ export const expenses = pgTable("expenses", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 
-  totalAmount: doublePrecision("total_amount").notNull(),
+  totalAmount: doublePrecision("total_amount").default(0),
   currency: text("currency").notNull().default("USD"),
   merchant: text("merchant"),
 
@@ -88,6 +88,9 @@ export const insertExpenseSchema = createInsertSchema(expenses).pick({
   source: true,
   note: true,
   occuredAt: true,
+  totalAmount: true,
+  currency: true,
+  merchant: true,
 });
 
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;

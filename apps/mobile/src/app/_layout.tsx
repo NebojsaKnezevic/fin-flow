@@ -1,5 +1,10 @@
 import { Stack } from "expo-router";
-import { PaperProvider, MD3LightTheme, MD3DarkTheme } from "react-native-paper";
+import {
+  PaperProvider,
+  MD3LightTheme,
+  MD3DarkTheme,
+  MD3Theme,
+} from "react-native-paper";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useThemeStore } from "../../store/theme.store";
 import { useMemo } from "react";
@@ -9,7 +14,30 @@ import Toast, {
   ToastConfig,
 } from "react-native-toast-message";
 import { Dimensions } from "react-native";
+import "react-native-paper";
 
+export type AppTheme = MD3Theme & {
+  fontStyles: {
+    casual: {
+      fontSize: number;
+      fontWeight:
+        | "normal"
+        | "bold"
+        | "100"
+        | "200"
+        | "300"
+        | "400"
+        | "500"
+        | "600"
+        | "700"
+        | "800"
+        | "900";
+      color: string;
+      marginRight: number;
+      minWidth: number;
+    };
+  };
+};
 const { width } = Dimensions.get("window");
 
 const toastConfig: ToastConfig = {
@@ -54,6 +82,15 @@ const fintechLightTheme = {
     outline: "#a7f3d0",
     error: "#dc2626",
   },
+  fontStyles: {
+    casual: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: "#888",
+      marginRight: 8,
+      minWidth: 110,
+    },
+  },
 };
 
 const fintechDarkTheme = {
@@ -68,6 +105,15 @@ const fintechDarkTheme = {
     onPrimaryContainer: "#a7f3d0",
     outline: "#0f766e",
     error: "#ef4444",
+  },
+  fontStyles: {
+    casual: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: "#888",
+      marginRight: 8,
+      minWidth: 110,
+    },
   },
 };
 
