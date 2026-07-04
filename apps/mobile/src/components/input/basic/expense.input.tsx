@@ -40,19 +40,6 @@ export default function Expense() {
         val={newExpense.merchant}
         setValue={(val) => setNewExpense({ ...newExpense, merchant: val })}
       />
-
-      <ExpenseItems
-        setTotalAmount={(val: number) =>
-          setNewExpense({ ...newExpense, totalAmount: val })
-        }
-      />
-
-      <CustomInputField
-        label="Currency:"
-        val={newExpense.currency}
-        setValue={(val) => setNewExpense({ ...newExpense, currency: val })}
-      />
-      <CustomInputField label="Total:" val={newExpense.totalAmount} />
       <CustomInputField
         label="Note:"
         val={newExpense.note}
@@ -62,6 +49,38 @@ export default function Expense() {
         label="Occured At:"
         val={newExpense.occuredAt.toLocaleDateString()}
       />
+
+      <ExpenseItems
+        setTotalAmount={(val: number) =>
+          setNewExpense({ ...newExpense, totalAmount: val })
+        }
+      />
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          gap: 4,
+          width: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <View style={{ flex: 1 }}>
+          <CustomInputField
+            customLabel={false}
+            label="Total:"
+            val={newExpense.totalAmount}
+          />
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <CustomInputField
+            customLabel={false}
+            label="Currency:"
+            val={newExpense.currency}
+            setValue={(val) => setNewExpense({ ...newExpense, currency: val })}
+          />
+        </View>
+      </View>
     </ScrollView>
   );
 }

@@ -196,15 +196,15 @@ export default function ExpenseItems({ setTotalAmount }: IProps) {
                       disabled={true}
                       style={[styles.input, styles.flex2]}
                     />
-
-                    <IconButton
-                      icon="trash-can-outline"
-                      iconColor="red"
-                      size={16}
-                      style={styles.iconButtonZeroMargin}
-                      onPress={() => removeItemFromStore(i)}
-                    />
                   </View>
+
+                  <IconButton
+                    icon="trash-can-outline"
+                    iconColor="red"
+                    size={16}
+                    style={styles.iconButtonZeroMargin}
+                    onPress={() => removeItemFromStore(i)}
+                  />
                 </View>
               );
             })}
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   },
   itemRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingVertical: 6,
     width: "100%",
   },
@@ -312,17 +312,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   chip: {
-    // height: 26,
-    paddingVertical: 0,
-    flexDirection: "row",
-    flexWrap: "wrap",
+    height: 28,
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "center",
+    maxWidth: 110,
   },
   chipText: {
     fontSize: 11,
-    flexShrink: 1,
     marginVertical: 0,
+    // numberOfLines: 1,
+    // ellipsizeMode: "tail",
   },
   input: {
     backgroundColor: "transparent",
