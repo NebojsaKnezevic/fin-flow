@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { AppError } from "../errors/app.error";
-import { expenses } from "../db/schemas/schema";
+import { expenseCategory, expenses } from "../db/schemas/schema";
 import db from "../db/db";
-import { count, desc, eq } from "drizzle-orm";
+import { aliasedTable, count, desc, eq, isNull, or, sql } from "drizzle-orm";
+import { union } from "drizzle-orm/pg-core";
+import { formatCategoriesToTree } from "../../helpers/category.helper";
 
 export async function expenseController(req: Request, res: Response) {
   const page = parseInt(req.query.page as string) || 1;
@@ -12,10 +14,7 @@ export async function expenseController(req: Request, res: Response) {
     throw new AppError(400, "Page and limit must be positive numbers.");
 
   const offset = (page - 1) * limit;
-  const userFilter = eq(
-    expenses.userId,
-    req.user?.id || "8bde4059-33ce-4975-9c96-f56a23f6f2ad",
-  );
+  const userFilter = eq(expenses.userId, req.user.id);
 
   const [data, totalCountResult] = await Promise.all([
     db
@@ -42,4 +41,20 @@ export async function expenseController(req: Request, res: Response) {
       hasNextPage: page < totalPages,
     },
   });
+}
+
+export async function categoryController(req: Request, res: Response) {
+  const userId = req.user?.id || (req.query.userId as string);
+
+  // const parentCategory = aliasedTable(expenseCategory, "parent_category");
+  // const childCategory = aliasedTable(expenseCategory, "child_category");
+
+  const result = await db
+    .select()
+    .from(expenseCategory)
+    .where(
+      or(eq(expenseCategory.userId, userId), isNull(expenseCategory.parentId)),
+    );
+
+  return res.status(200).json(result);
 }

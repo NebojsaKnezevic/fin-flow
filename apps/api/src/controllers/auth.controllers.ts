@@ -8,6 +8,7 @@ import { AppError } from "../errors/app.error";
 import jwt from "jsonwebtoken";
 
 export async function registerController(req: Request, res: Response) {
+  console.log("reg");
   const validation = registerSchema.safeParse(req.body);
 
   if (!validation.success) {
@@ -93,13 +94,14 @@ export async function loginController(req: Request, res: Response) {
 }
 
 export async function meController(req: Request, res: Response) {
+  console.log("me");
   const authHeader = req.headers["authorization"];
 
   if (!authHeader || !authHeader.startsWith("Bearer "))
     return res.status(401).json({ error: "Unauthorized: Missing token" });
 
   const token = authHeader.split(" ")[1];
-  const JWT_SECRET = process.env.JWT_SECRET || "asdasdasdadas@@@@";
+  const JWT_SECRET = process.env.JWT_SECRET || "asdasdasdadas@@1@";
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as UserWithId & {

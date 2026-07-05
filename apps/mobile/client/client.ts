@@ -16,7 +16,7 @@ apiClient.interceptors.request.use(
     // console.log(config);
     try {
       const token = await SecureStore.getItemAsync("user_token");
-      Notify.success(JSON.stringify(token));
+      // Notify.success(JSON.stringify(token));
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -42,6 +42,10 @@ apiClient.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       Notify.error(JSON.stringify(error));
       router.replace("/login");
+    }
+
+    if (error.status === 401) {
+      SecureStore.deleteItemAsync("user_token");
     }
     return Promise.reject(`axios` + error);
   },

@@ -15,6 +15,27 @@
       "when": 1782230932196,
       "tag": "0001_chubby_gamora",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783157734905,
+      "tag": "0002_tranquil_scrambler",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783173657415,
+      "tag": "0003_slimy_the_leader",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783174946334,
+      "tag": "0004_flaky_nuke",
+      "breakpoints": true
     }
   ]
 }

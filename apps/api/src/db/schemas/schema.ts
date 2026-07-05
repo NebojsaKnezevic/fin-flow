@@ -6,6 +6,8 @@ import {
   doublePrecision,
   pgEnum,
   serial,
+  integer,
+  AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -37,14 +39,20 @@ export type NewUser = z.infer<typeof insertUserSchema>;
 export type UserWithId = z.infer<typeof userWithIdSchema>;
 
 // ==========================================
-// 2. EXPENSE CATEGORY TABELA (Tvoja super ideja)
+// 2. EXPENSE CATEGORY TABELA
 // ==========================================
 export const expenseCategory = pgTable("expense_category", {
   id: serial("id").primaryKey(),
   category: text("category").notNull(),
-  // testKolona: text("test_kolona"),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  parentId: integer("parent_id").references(
+    (): AnyPgColumn => expenseCategory.id,
+    { onDelete: "cascade" },
+  ),
 });
+
+export const expenseCategorySchema = createSelectSchema(expenseCategory);
+export type SelectExpenseCategory = z.infer<typeof expenseCategorySchema>;
 
 // ==========================================
 // 3. EXPENSES TABELA
