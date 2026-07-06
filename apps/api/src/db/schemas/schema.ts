@@ -8,6 +8,7 @@ import {
   serial,
   integer,
   AnyPgColumn,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -52,7 +53,13 @@ export const expenseCategory = pgTable("expense_category", {
 });
 
 export const expenseCategorySchema = createSelectSchema(expenseCategory);
-export type SelectExpenseCategory = z.infer<typeof expenseCategorySchema>;
+export type ExpenseCategory = z.infer<typeof expenseCategorySchema>;
+export const insertExpenseCategorySchema = createInsertSchema(
+  expenseCategory,
+).omit({
+  id: true,
+});
+export type InsertExpenseCategory = z.infer<typeof insertExpenseCategorySchema>;
 
 // ==========================================
 // 3. EXPENSES TABELA
@@ -113,10 +120,10 @@ export const expenseItems = pgTable("expense_items", (t) => ({
   // name: t.text().notNull(),
   price: t.doublePrecision().notNull(),
   quantity: t.doublePrecision().notNull(),
-  categoryId: t
-    .integer("category_id")
-    .notNull()
-    .references(() => expenseCategory.id, { onDelete: "restrict" }),
+  // categoryId: t
+  //   .integer("category_id")
+  //   .notNull()
+  //   .references(() => expenseCategory.id, { onDelete: "restrict" }),
   expenseId: t
     .uuid("expense_id")
     .notNull()
@@ -129,3 +136,26 @@ export const insertExpenseItemSchema = createInsertSchema(expenseItems).omit({
 });
 
 export type InsertExpenseItem = z.infer<typeof insertExpenseItemSchema>;
+
+// ==========================================
+// 5. EXPENSE ITEMS - CATEGORIES TABELA
+// ==========================================
+
+export const expenseItemsCategories = pgTable(
+  "expense_items_categories",
+  (t) => ({
+    itemId: t
+      .uuid("item_id")
+      .notNull()
+      .references(() => expenseItems.id, { onDelete: "cascade" }),
+
+    categoryId: t
+      .integer("category_id")
+      .notNull()
+      .references(() => expenseCategory.id, { onDelete: "cascade" }),
+  }),
+
+  (t) => ({
+    pk: primaryKey({ columns: [t.itemId, t.categoryId] }),
+  }),
+);

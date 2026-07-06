@@ -10,6 +10,13 @@ export default function setRoutes(app: Express) {
     });
   });
 
-  app.use("/auth", authRoutes);
+  app.use(
+    "/auth",
+    // (req: Request, res: Response, next: Function) => {
+    //   res.status(401).json({ message: "Unauthorized" });
+    // },
+
+    authRoutes,
+  );
   app.use("/expenses", expenseRoutes);
 }
