@@ -51,9 +51,9 @@ export default function Expense() {
       />
 
       <ExpenseItems
-        setTotalAmount={(val: number) =>
-          setNewExpense({ ...newExpense, totalAmount: val })
-        }
+      // setTotalAmount={(val: number) =>
+      //   setNewExpense({ ...newExpense, totalAmount: val })
+      // }
       />
       <View
         style={{

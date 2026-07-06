@@ -19,6 +19,9 @@ import {
 } from "react-native-paper";
 import { AppTheme } from "@/app/_layout";
 import { useExpenseStore } from "../../../../store/expense.store";
+import CategoryInput from "./category.input";
+import { apiClient } from "../../../../client/client";
+import { useQuery } from "@tanstack/react-query";
 
 const CATEGORIES = [
   "Hrana",
@@ -30,12 +33,21 @@ const CATEGORIES = [
   "dasdsafdsfawtaewtfsefsfdsfd",
 ];
 
-interface IProps {
-  setTotalAmount: (val: number) => void;
-}
+// interface IProps {
+//   setTotalAmount: (val: number) => void;
+// }
 
-export default function ExpenseItems({ setTotalAmount }: IProps) {
+export default function ExpenseItems() {
   const theme = useTheme() as AppTheme;
+
+  const categories = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const response = await apiClient.get("expenses/categories");
+      return response.data;
+    },
+    staleTime: Infinity,
+  });
 
   const items = useExpenseStore((s) => s.expenseItems);
   const addItemInStore = useExpenseStore((s) => s.addExpenseItem);
@@ -51,7 +63,7 @@ export default function ExpenseItems({ setTotalAmount }: IProps) {
     addItemInStore({
       price: 0,
       quantity: 1,
-      categoryId: 0,
+      categories: [],
     });
   };
 
@@ -89,8 +101,8 @@ export default function ExpenseItems({ setTotalAmount }: IProps) {
                   : item.quantity || 0;
               const totalCost = currentPrice * currentQuantity;
 
-              const currentCategoryName =
-                CATEGORIES[item.categoryId ?? 0] || "Izaberi";
+              // const currentCategoryName =
+              //   CATEGORIES[item.categoryId ?? 0] || "Izaberi";
 
               return (
                 <View key={i} style={[styles.itemRow, dynamicBackground]}>
@@ -103,44 +115,17 @@ export default function ExpenseItems({ setTotalAmount }: IProps) {
                   /> */}
 
                   <View style={styles.itemGrid}>
-                    <View style={styles.categoriesWrapper}>
-                      <Chip
-                        compact
-                        icon="tag"
-                        style={styles.chip}
-                        textStyle={styles.chipText}
-                      >
-                        {currentCategoryName}
-                      </Chip>
-
-                      <Menu
-                        visible={isMenuOpen}
-                        onDismiss={closeMenu}
-                        anchor={
-                          <IconButton
-                            icon="plus-circle"
-                            size={20}
-                            iconColor={theme.colors.primary}
-                            style={styles.iconButtonZeroMargin}
-                            onPress={() => openMenu(i)}
-                          />
-                        }
-                      >
-                        {CATEGORIES.map((cat, catIdx) => (
-                          <Menu.Item
-                            key={catIdx}
-                            onPress={() => {
-                              updateItemInStore(i, {
-                                ...item,
-                                categoryId: catIdx,
-                              });
-                              closeMenu();
-                            }}
-                            title={cat}
-                          />
-                        ))}
-                      </Menu>
-                    </View>
+                    {categories.isLoading ? (
+                      <Text>Loading...</Text>
+                    ) : categories.isError ? (
+                      <Text>Error loading categories</Text>
+                    ) : (
+                      <CategoryInput
+                        item={item}
+                        i={i}
+                        categories={categories.data}
+                      />
+                    )}
 
                     <TextInput
                       value={item.quantity === 0 ? "" : String(item.quantity)}

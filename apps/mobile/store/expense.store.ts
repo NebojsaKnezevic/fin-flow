@@ -1,13 +1,21 @@
-import { InsertExpense, InsertExpenseItem } from "@api/schema";
+import {
+  InsertExpense,
+  InsertExpenseItem,
+  InsertExpenseCategory,
+} from "@api/schema";
 import { create } from "zustand";
+
+export type ExpenseItemObj = InsertExpenseItem & {
+  categories: number[];
+};
 
 interface ExpenseState {
   expense: InsertExpense;
-  expenseItems: InsertExpenseItem[];
+  expenseItems: ExpenseItemObj[];
   setExpanse: (e: InsertExpense) => void;
-  addExpenseItem: (ei: InsertExpenseItem) => void;
+  addExpenseItem: (ei: ExpenseItemObj) => void;
   removeExpenseItem: (index: number) => void;
-  updateExpenseItem: (index: number, item: InsertExpenseItem) => void;
+  updateExpenseItem: (index: number, item: ExpenseItemObj) => void;
 }
 
 export const useExpenseStore = create<ExpenseState>((set) => {
@@ -23,7 +31,7 @@ export const useExpenseStore = create<ExpenseState>((set) => {
 
     setExpanse: (e: InsertExpense) => set({ expense: e }),
 
-    addExpenseItem: (ei: InsertExpenseItem) =>
+    addExpenseItem: (ei: ExpenseItemObj) =>
       set((state) => ({ expenseItems: [...state.expenseItems, ei] })),
 
     removeExpenseItem: (index: number) =>
@@ -31,7 +39,7 @@ export const useExpenseStore = create<ExpenseState>((set) => {
         expenseItems: s.expenseItems.filter((_, i) => index !== i),
       })),
 
-    updateExpenseItem: (index: number, item: InsertExpenseItem) =>
+    updateExpenseItem: (index: number, item: ExpenseItemObj) =>
       set((s) => {
         s.expenseItems[index] = item;
         return {
