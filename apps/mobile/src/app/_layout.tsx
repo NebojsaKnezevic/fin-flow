@@ -37,6 +37,9 @@ export type AppTheme = MD3Theme & {
       minWidth: number;
     };
   };
+  ripple: {
+    color: string;
+  };
 };
 const { width } = Dimensions.get("window");
 
@@ -91,6 +94,9 @@ const fintechLightTheme = {
       minWidth: 110,
     },
   },
+  ripple: {
+    color: "rgba(0, 0, 0, 0.08)",
+  },
 };
 
 const fintechDarkTheme = {
@@ -114,6 +120,9 @@ const fintechDarkTheme = {
       marginRight: 8,
       minWidth: 110,
     },
+  },
+  ripple: {
+    color: "rgba(255, 255, 255, 0.12)",
   },
 };
 

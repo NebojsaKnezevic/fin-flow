@@ -1,10 +1,10 @@
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import ExpenseItems from "./expense-item.input";
+import ExpenseItems from "./expense-items/expense-item.input";
 import { useExpenseStore } from "../../../../store/expense.store";
 import { InsertExpense } from "@api/schema";
 import { Text, TextInput, useTheme } from "react-native-paper";
-import CustomInputField from "./custom-field.input";
+import CustomInputField from "./custom-field/custom-field.input";
 import { AppTheme } from "@/app/_layout";
 
 export default function Expense() {
