@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { MultiSelect } from "react-native-element-dropdown";
 import { useTheme } from "react-native-paper";
 import { AppTheme } from "@/app/_layout";
@@ -53,7 +53,6 @@ const SearchDropDown = ({ categories, item, index }: DropdownPrimerProps) => {
     }
   };
 
-  // Mapiramo podatke u format za dropdown
   const data: DropdownItem[] = categories.map((cat) => ({
     label: cat.category,
     value: cat.id,
@@ -73,26 +72,77 @@ const SearchDropDown = ({ categories, item, index }: DropdownPrimerProps) => {
           styles.placeholderStyle,
           { color: theme.colors.onSurfaceVariant },
         ]}
-        selectedTextStyle={[styles.selectedTextStyle, , { color: "white" }]}
+        selectedTextStyle={[styles.selectedTextStyle, { color: "white" }]}
         inputSearchStyle={[styles.inputSearchStyle, { color: "white" }]}
-        
-        containerStyle={{ backgroundColor: theme.colors.elevation.level1 }}
+        containerStyle={[
+          styles.dropdownContainer,
+          { backgroundColor: theme.colors.elevation.level1 },
+        ]}
+        itemContainerStyle={styles.itemContainer}
+        itemTextStyle={[styles.itemText, { color: "white" }]}
         activeColor={theme.colors.primaryContainer}
+        flatListProps={{
+          style: styles.flatList,
+        }}
+        // === Custom render da prikaže selektovane stavke ===
+        renderItem={(dropdownItem) => {
+          const isSelected = item.categories.includes(
+            dropdownItem.value as number,
+          );
+
+          return (
+            <View
+              style={[
+                styles.itemContainer,
+                {
+                  backgroundColor: isSelected
+                    ? theme.colors.primaryContainer
+                    : "transparent",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.itemText,
+                  {
+                    color: "white",
+                    fontWeight: isSelected ? "600" : "400",
+                  },
+                ]}
+              >
+                {dropdownItem.label}
+              </Text>
+              {isSelected && (
+                <Text style={{ color: theme.colors.primary, fontSize: 16 }}>
+                  ✓
+                </Text>
+              )}
+            </View>
+          );
+        }}
+        // =====================================================
         search
         data={data}
         labelField="label"
         valueField="value"
         placeholder={!isFocus ? "Search Name" : "..."}
         searchPlaceholder="Search..."
-        value={item.categories}
+        value={item.categories.map((x) => x.toString())}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={(value: number[]) => {
-          const added = value.find((v) => !item.categories.includes(v));
-          const removed = item.categories.find((v) => !value.includes(v));
+        onChange={(value: string[]) => {
+          const added = value.find(
+            (v) => !item.categories.map((x) => x.toString()).includes(v),
+          );
+          const removed = item.categories
+            .map((x) => x.toString())
+            .find((v) => !value.includes(v));
 
-          if (added !== undefined) toggleCategory(added);
-          if (removed !== undefined) toggleCategory(removed);
+          if (added !== undefined) toggleCategory(Number(added));
+          if (removed !== undefined) toggleCategory(Number(removed));
         }}
         visibleSelectedItem={false}
       />
@@ -110,9 +160,7 @@ const styles = StyleSheet.create({
   dropdown: {
     height: 40,
     borderWidth: 0,
-    // borderRadius: 8,
     paddingHorizontal: 8,
-    // color: "white",
   },
   placeholderStyle: {
     fontSize: 12,
@@ -126,5 +174,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderRadius: 8,
     color: "white",
+  },
+  dropdownContainer: {
+    borderRadius: 8,
+    borderWidth: 0,
+    marginTop: 4,
+    overflow: "hidden",
+  },
+  itemContainer: {
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+  },
+  itemText: {
+    fontSize: 14,
+  },
+  flatList: {
+    maxHeight: 250,
   },
 });
