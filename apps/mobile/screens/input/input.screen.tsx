@@ -1,9 +1,9 @@
 import { Text } from "react-native-paper";
 import { View, StyleSheet, ScrollView } from "react-native";
 import InputTabs from "@/components/input/tabs.input";
-import InputForm from "@/components/input/basic/form.input";
+// import InputForm from "@/components/input/basic/form.input";
 import { insertExpenseSchema } from "@api/schema";
-import ExpenseList from "@/components/input/basic/list.input";
+// import ExpenseList from "@/components/input/basic/list.input";
 import Expense from "@/components/input/basic/expense.input";
 
 export default function InputScreen() {
@@ -15,12 +15,12 @@ export default function InputScreen() {
         <InputTabs />
       </View>
 
-      <ScrollView style={styles.content}>
+      <View style={styles.content}>
         {/* <Text variant="headlineLarge">Welcome back! </Text> */}
 
         {/* <ExpenseList /> */}
         <Expense />
-      </ScrollView>
+      </View>
     </View>
   );
 }

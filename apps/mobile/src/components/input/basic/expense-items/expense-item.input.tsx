@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
   TouchableWithoutFeedback,
   Keyboard,
   StyleSheet,
@@ -15,14 +12,13 @@ import {
   useTheme,
   Button,
   Chip,
-  Menu,
 } from "react-native-paper";
 import { AppTheme } from "@/app/_layout";
 import {
   ExpenseItemObj,
   useExpenseStore,
 } from "../../../../../store/expense.store";
-import CategoryInput from "./categories/category.input";
+// import CategoryInput from "./categories/category.input";
 import { apiClient } from "../../../../../client/client";
 import { useQuery } from "@tanstack/react-query";
 import SearchDropDown from "./categories/category.-search.input";
@@ -95,12 +91,14 @@ export default function ExpenseItems() {
   const dynamicBackground = { backgroundColor: theme.colors.background };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <View
+      // behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container, dynamicBackground]}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView keyboardShouldPersistTaps="handled">
+        <View
+        // keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.mainWrapper}>
             {/* Header */}
             <View style={[styles.headerRow, dynamicBackground]}>
@@ -128,6 +126,7 @@ export default function ExpenseItems() {
 
               return (
                 // ROWs
+
                 <View key={i} style={{ padding: 0, margin: 0, gap: 0 }}>
                   <View style={[styles.itemRow, dynamicBackground]}>
                     {/* <IconButton
@@ -260,11 +259,12 @@ export default function ExpenseItems() {
                 Add Item
               </Button>
             </View>
-            <Text>{JSON.stringify(items)}</Text>
+
+            {/* <Text>{JSON.stringify(items)}</Text> */}
           </View>
-        </ScrollView>
+        </View>
       </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -273,10 +273,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 4,
-    width: "100%",
+    minWidth: "100%",
   },
   mainWrapper: {
-    flex: 1,
+    // flex: 1,
+    minWidth: "100%",
     flexDirection: "column",
   },
   headerRow: {
@@ -307,7 +308,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 13,
     color: "#888",
-    flex: 5,
+    flex: 3,
   },
   headerTextQuantity: {
     fontWeight: "bold",

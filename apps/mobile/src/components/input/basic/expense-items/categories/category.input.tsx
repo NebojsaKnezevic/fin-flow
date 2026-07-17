@@ -108,7 +108,7 @@ const CategoryInput = ({ item, i, categories }: ExpenseItemProps) => {
   );
 };
 
-export default CategoryInput;
+// export default CategoryInput;
 
 const styles = StyleSheet.create({
   categoriesWrapper: {

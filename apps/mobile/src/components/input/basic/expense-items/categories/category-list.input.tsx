@@ -8,6 +8,7 @@ import { AppTheme } from "@/app/_layout";
 import { JSX } from "react";
 import { ExpenseCategory } from "@api/schema";
 import { useThemeStore } from "../../../../../../store/theme.store";
+import CategoryHelpers from "../../../../../../helpers/category.helpers";
 
 interface IProp {
   categories: ExpenseCategory[];
@@ -15,25 +16,6 @@ interface IProp {
   depth?: number;
   item: ExpenseItemObj;
   index: number;
-}
-
-function getDescendants(id: number, categories: ExpenseCategory[]): number[] {
-  const children = categories.filter((c) => c.parentId === id);
-
-  let result: number[] = [];
-
-  for (const child of children) {
-    result.push(child.id);
-    result.push(...getDescendants(child.id, categories));
-  }
-
-  return [id, ...result];
-}
-
-function getParents(id: number, categories: ExpenseCategory[]): number[] {
-  const item = categories.find((c) => c.id === id);
-  if (item?.parentId === null) return [];
-  return [item?.parentId, ...getParents(item?.parentId, categories)];
 }
 
 const CategoryList = ({
@@ -66,10 +48,8 @@ const CategoryList = ({
               //   console.log("pressed", cat.id);
               //if it has the cat, we remove it, if it doesnt we add it
               if (item.categories.includes(cat.id)) {
-                const descendantsId: number[] = getDescendants(
-                  cat.id,
-                  categoriesOG,
-                );
+                const descendantsId: number[] =
+                  CategoryHelpers.getDescendantsIds(cat.id, categoriesOG);
 
                 updateItemInStore(index, {
                   ...item,
@@ -81,7 +61,11 @@ const CategoryList = ({
               } else {
                 updateItemInStore(index, {
                   ...item,
-                  categories: [...item.categories, cat.id],
+                  // categories: [...item.categories, cat.id],
+                  categories: [
+                    ...CategoryHelpers.getParentsIds(cat.id, categoriesOG),
+                    cat.id,
+                  ],
                   //   categories: [
                   //     cat.id,
                   //     ...getParents(cat.id, categoriesOG),

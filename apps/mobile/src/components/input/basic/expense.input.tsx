@@ -1,5 +1,11 @@
 import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import ExpenseItems from "./expense-items/expense-item.input";
 import { useExpenseStore } from "../../../../store/expense.store";
 import { InsertExpense } from "@api/schema";
@@ -23,79 +29,81 @@ export default function Expense() {
 
     setNewExpense({ ...newExpense, totalAmount: total });
   }, [items]);
+
   return (
-    <ScrollView
-      style={{ ...styles.container, backgroundColor: theme.colors.background }}
-      contentContainerStyle={styles.centerContent}
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
-      {/* <Text>{JSON.stringify(newExpense)}</Text> */}
-      {/* <Text>{JSON.stringify(newExpense.)}</Text> */}
-      <CustomInputField
-        label="Receipt Name:"
-        val={newExpense.name}
-        setValue={(val) => setNewExpense({ ...newExpense, name: val })}
-      />
-      <CustomInputField
-        label="Merchant:"
-        val={newExpense.merchant}
-        setValue={(val) => setNewExpense({ ...newExpense, merchant: val })}
-      />
-      <CustomInputField
-        label="Note:"
-        val={newExpense.note}
-        setValue={(val) => setNewExpense({ ...newExpense, note: val })}
-      />
-      <CustomInputField
-        label="Occured At:"
-        val={newExpense.occuredAt.toLocaleDateString()}
-      />
-
-      <ExpenseItems
-      // setTotalAmount={(val: number) =>
-      //   setNewExpense({ ...newExpense, totalAmount: val })
-      // }
-      />
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          gap: 4,
-          width: "100%",
-          justifyContent: "space-between",
-        }}
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.centerContent}
+        keyboardShouldPersistTaps="handled"
       >
-        <View style={{ flex: 1 }}>
-          <CustomInputField
-            customLabel={false}
-            label="Total:"
-            val={newExpense.totalAmount}
-          />
-        </View>
+        <CustomInputField
+          label="Receipt Name:"
+          val={newExpense.name}
+          setValue={(val) => setNewExpense({ ...newExpense, name: val })}
+        />
+        <CustomInputField
+          label="Merchant:"
+          val={newExpense.merchant}
+          setValue={(val) => setNewExpense({ ...newExpense, merchant: val })}
+        />
+        <CustomInputField
+          label="Note:"
+          val={newExpense.note}
+          setValue={(val) => setNewExpense({ ...newExpense, note: val })}
+        />
+        <CustomInputField
+          label="Occured At:"
+          val={newExpense.occuredAt.toLocaleDateString()}
+        />
 
-        <View style={{ flex: 1 }}>
-          <CustomInputField
-            customLabel={false}
-            label="Currency:"
-            val={newExpense.currency}
-            setValue={(val) => setNewExpense({ ...newExpense, currency: val })}
-          />
+        <ExpenseItems />
+
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 4,
+            width: "100%",
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            <CustomInputField
+              customLabel={false}
+              label="Total:"
+              val={newExpense.totalAmount}
+            />
+          </View>
+
+          <View style={{ flex: 1 }}>
+            <CustomInputField
+              customLabel={false}
+              label="Currency:"
+              val={newExpense.currency}
+              setValue={(val) =>
+                setNewExpense({ ...newExpense, currency: val })
+              }
+            />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    // backgroundColor:
-    // backgroundColor:  theme ,
+    // flex: 1,
+    minWidth: "100%",
   },
   centerContent: {
     padding: 0,
-    // alignItems: "center",
+    paddingBottom: 40,
   },
-
   receiptPaper: {
     backgroundColor: "#ffffff",
     width: "100%",
@@ -111,7 +119,6 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 5,
   },
-
   invisibleInput: {
     backgroundColor: "transparent",
     height: 30,
@@ -192,7 +199,7 @@ const styles = StyleSheet.create({
   },
   addRowContainer: {
     alignItems: "flex-start",
-    marginLeft: 24, // Da se poravna sa tekstom zbog delete ikonice
+    marginLeft: 24,
     marginTop: 8,
   },
   totalContainer: {

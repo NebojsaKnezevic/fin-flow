@@ -8,6 +8,7 @@ import {
   ExpenseItemObj,
   useExpenseStore,
 } from "../../../../../../store/expense.store";
+import CategoryHelpers from "../../../../../../helpers/category.helpers";
 
 interface DropdownPrimerProps {
   categories: ExpenseCategory[];
@@ -20,18 +21,6 @@ interface DropdownItem {
   value: number;
 }
 
-function getDescendants(id: number, categories: ExpenseCategory[]): number[] {
-  const children = categories.filter((c) => c.parentId === id);
-  let result: number[] = [];
-
-  for (const child of children) {
-    result.push(child.id);
-    result.push(...getDescendants(child.id, categories));
-  }
-
-  return [id, ...result];
-}
-
 const SearchDropDown = ({ categories, item, index }: DropdownPrimerProps) => {
   const theme = useTheme() as AppTheme;
   const [isFocus, setIsFocus] = useState<boolean>(false);
@@ -39,16 +28,33 @@ const SearchDropDown = ({ categories, item, index }: DropdownPrimerProps) => {
 
   const toggleCategory = (catId: number) => {
     if (item.categories.includes(catId)) {
-      const descendantsId: number[] = getDescendants(catId, categories);
+      const descendantsId: number[] = CategoryHelpers.getDescendantsIds(
+        catId,
+        categories,
+      );
 
       updateItemInStore(index, {
         ...item,
         categories: item.categories.filter((x) => !descendantsId.includes(x)),
       });
     } else {
+      // updateItemInStore(index, {
+      //   ...item,
+      //   categories: [...item.categories, catId],
+      // });
+
       updateItemInStore(index, {
         ...item,
-        categories: [...item.categories, catId],
+        // categories: [...item.categories, cat.id],
+        categories: [
+          ...item.categories,
+          ...CategoryHelpers.getParentsIds(catId, categories),
+          catId,
+        ],
+        //   categories: [
+        //     cat.id,
+        //     ...getParents(cat.id, categoriesOG),
+        //   ].reverse(),
       });
     }
   };
@@ -116,7 +122,13 @@ const SearchDropDown = ({ categories, item, index }: DropdownPrimerProps) => {
                 {dropdownItem.label}
               </Text>
               {isSelected && (
-                <Text style={{ color: theme.colors.primary, fontSize: 16 }}>
+                <Text
+                  style={{
+                    color: theme.colors.primary,
+                    fontSize: 16,
+                    paddingHorizontal: 4,
+                  }}
+                >
                   ✓
                 </Text>
               )}
@@ -155,7 +167,7 @@ export default SearchDropDown;
 const styles = StyleSheet.create({
   container: {
     padding: 0,
-    flex: 5,
+    flex: 3,
   },
   dropdown: {
     height: 40,
@@ -179,10 +191,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 0,
     marginTop: 4,
+    // paddingVertical: 52,
     overflow: "hidden",
+    width: "auto",
+    marginRight: 35,
   },
   itemContainer: {
-    paddingVertical: 0,
+    paddingVertical: 1,
     paddingHorizontal: 0,
   },
   itemText: {
