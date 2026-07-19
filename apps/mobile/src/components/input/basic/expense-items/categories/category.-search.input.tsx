@@ -9,9 +9,10 @@ import {
   useExpenseStore,
 } from "../../../../../../store/expense.store";
 import CategoryHelpers from "../../../../../../helpers/category.helpers";
+import { useCategories } from "../../../../../../hooks/queries/useCategories";
 
 interface DropdownPrimerProps {
-  categories: ExpenseCategory[];
+  // categories: ExpenseCategory[];
   item: ExpenseItemObj;
   index: number;
 }
@@ -21,10 +22,16 @@ interface DropdownItem {
   value: number;
 }
 
-const SearchDropDown = ({ categories, item, index }: DropdownPrimerProps) => {
+const SearchDropDown = ({ item, index }: DropdownPrimerProps) => {
   const theme = useTheme() as AppTheme;
   const [isFocus, setIsFocus] = useState<boolean>(false);
   const updateItemInStore = useExpenseStore((s) => s.updateExpenseItem);
+
+  const categoryList = useCategories();
+
+  if (categoryList.isLoading) return <Text>Loading...</Text>;
+
+  const categories = categoryList.data as ExpenseCategory[];
 
   const toggleCategory = (catId: number) => {
     if (item.categories.includes(catId)) {
@@ -47,9 +54,11 @@ const SearchDropDown = ({ categories, item, index }: DropdownPrimerProps) => {
         ...item,
         // categories: [...item.categories, cat.id],
         categories: [
-          ...item.categories,
-          ...CategoryHelpers.getParentsIds(catId, categories),
-          catId,
+          ...new Set([
+            ...item.categories,
+            ...CategoryHelpers.getParentsIds(catId, categories),
+            catId,
+          ]),
         ],
         //   categories: [
         //     cat.id,

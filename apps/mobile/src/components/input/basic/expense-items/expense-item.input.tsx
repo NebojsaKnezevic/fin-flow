@@ -23,6 +23,7 @@ import { apiClient } from "../../../../../client/client";
 import { useQuery } from "@tanstack/react-query";
 import SearchDropDown from "./categories/category.-search.input";
 import { ExpenseCategory } from "@api/schema";
+import { useCategories } from "../../../../../hooks/queries/useCategories";
 
 function getDescendants(id: number, categories: ExpenseCategory[]): number[] {
   const children = categories.filter((c) => c.parentId === id);
@@ -39,16 +40,9 @@ function getDescendants(id: number, categories: ExpenseCategory[]): number[] {
 export default function ExpenseItems() {
   const theme = useTheme() as AppTheme;
 
-  const categories = useQuery<ExpenseCategory[], Error>({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const response = await apiClient.get<ExpenseCategory[]>(
-        "expenses/categories",
-      );
-      return response.data;
-    },
-    staleTime: Infinity,
-  });
+  const categories = useCategories();
+
+  // if(categories.data)
 
   const items = useExpenseStore((s) => s.expenseItems);
   const addItemInStore = useExpenseStore((s) => s.addExpenseItem);
@@ -149,7 +143,7 @@ export default function ExpenseItems() {
                         //   categories={categories.data}
                         // />
                         <SearchDropDown
-                          categories={categories.data || []}
+                          // categories={categories.data || []}
                           item={item}
                           index={i}
                         />
@@ -260,7 +254,7 @@ export default function ExpenseItems() {
               </Button>
             </View>
 
-            {/* <Text>{JSON.stringify(items)}</Text> */}
+            <Text>{JSON.stringify(items)}</Text>
           </View>
         </View>
       </TouchableWithoutFeedback>

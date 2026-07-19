@@ -45,7 +45,7 @@ export async function expenseController(req: Request, res: Response) {
 
 export async function categoryController(req: Request, res: Response) {
   const userId = req.user?.id || (req.query.userId as string);
-  console.log(userId);
+  // console.log(userId);
   // const parentCategory = aliasedTable(expenseCategory, "parent_category");
   // const childCategory = aliasedTable(expenseCategory, "child_category");
 
