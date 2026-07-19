@@ -9,9 +9,11 @@ import {
 import ExpenseItems from "./expense-items/expense-item.input";
 import { useExpenseStore } from "../../../../store/expense.store";
 import { InsertExpense } from "@api/schema";
-import { Text, TextInput, useTheme } from "react-native-paper";
+import { Button, Text, TextInput, useTheme } from "react-native-paper";
 import CustomInputField from "./custom-field/custom-field.input";
 import { AppTheme } from "@/app/_layout";
+// import { QuickDatePicker } from "./custom-field/custom-date.input";
+import { Notify } from "../../../../helpers/toast.helper";
 
 export default function Expense() {
   const theme: AppTheme = useTheme();
@@ -19,6 +21,7 @@ export default function Expense() {
   const setNewExpense = useExpenseStore((s) => s.setExpanse);
 
   const items = useExpenseStore((s) => s.expenseItems);
+  const isValid = useExpenseStore((s) => s.isValid);
 
   React.useEffect(() => {
     const total = items.reduce((acc, current) => {
@@ -41,6 +44,7 @@ export default function Expense() {
         contentContainerStyle={styles.centerContent}
         keyboardShouldPersistTaps="handled"
       >
+        {/* <Text>{JSON.stringify(newExpense)}</Text> */}
         <CustomInputField
           label="Receipt Name:"
           val={newExpense.name}
@@ -56,10 +60,38 @@ export default function Expense() {
           val={newExpense.note}
           setValue={(val) => setNewExpense({ ...newExpense, note: val })}
         />
+        {/* <CustomInputField
+          label="Occured At:"
+          val={newExpense.occuredAt.toLocaleDateString("US")}
+        /> */}
+
         <CustomInputField
           label="Occured At:"
           val={newExpense.occuredAt.toLocaleDateString()}
+          setValue={(val) =>
+            setNewExpense({ ...newExpense, occuredAt: new Date(val) })
+          }
+          validation={(text: string) => {
+            const timestamp = Date.parse(text);
+            if (isNaN(timestamp)) {
+              return [false, "Invalid date"];
+            }
+
+            const inputDate = new Date(timestamp);
+            const today = new Date();
+
+            today.setHours(0, 0, 0, 0);
+            inputDate.setHours(0, 0, 0, 0);
+
+            if (inputDate > today) {
+              return [false, "Date can't be from future"];
+            }
+
+            return [true, ""];
+          }}
         />
+
+        {/* <QuickDatePicker /> */}
 
         <ExpenseItems />
 
@@ -89,6 +121,19 @@ export default function Expense() {
               }
             />
           </View>
+        </View>
+
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <Button
+            disabled={!isValid}
+            mode="contained"
+            elevation={2}
+            onPress={() => Notify.success("TO implement!")}
+            style={styles.submitButton}
+            textColor="white"
+          >
+            SUBMIT
+          </Button>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -226,5 +271,11 @@ const styles = StyleSheet.create({
     marginTop: 24,
     borderRadius: 8,
     paddingVertical: 4,
+  },
+  submitButton: {
+    width: "25%",
+    margin: 15,
+    flex: 1,
+    // color: "white",
   },
 });

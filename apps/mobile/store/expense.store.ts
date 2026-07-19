@@ -12,22 +12,27 @@ export type ExpenseItemObj = InsertExpenseItem & {
 interface ExpenseState {
   expense: InsertExpense;
   expenseItems: ExpenseItemObj[];
+  isValid: boolean;
   setExpanse: (e: InsertExpense) => void;
   addExpenseItem: (ei: ExpenseItemObj) => void;
   removeExpenseItem: (index: number) => void;
   updateExpenseItem: (index: number, item: ExpenseItemObj) => void;
+  setValid: (x: boolean) => void;
 }
 
 export const useExpenseStore = create<ExpenseState>((set) => {
   return {
     expense: {
-      id: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-      userId: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+      id: "",
+      userId: "",
+
       source: "basic",
+      isValid: false,
       note: "",
-      occuredAt: new Date("2026-06-29T19:15:00.000Z"),
+      occuredAt: new Date(),
     },
     expenseItems: [],
+    isValid: false,
 
     setExpanse: (e: InsertExpense) => set({ expense: e }),
 
@@ -46,5 +51,7 @@ export const useExpenseStore = create<ExpenseState>((set) => {
           expenseItems: [...s.expenseItems],
         };
       }),
+
+    setValid: (x: boolean) => set({ isValid: x }),
   };
 });

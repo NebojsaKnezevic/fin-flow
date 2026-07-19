@@ -254,7 +254,7 @@ export default function ExpenseItems() {
               </Button>
             </View>
 
-            <Text>{JSON.stringify(items)}</Text>
+            {/* <Text>{JSON.stringify(items)}</Text> */}
           </View>
         </View>
       </TouchableWithoutFeedback>
