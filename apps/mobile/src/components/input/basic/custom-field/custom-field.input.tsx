@@ -27,6 +27,8 @@ export default function CustomInputField({
   const [value, setVal] = useState(val?.toString() || "");
   const [error, setError] = useState("");
 
+  if (val && validation) validation(val.toString());
+
   const setData = (t: string) => {
     const [isValid, msg] = validation ? validation(t) : [true, ""];
     setVal(t);
@@ -41,10 +43,6 @@ export default function CustomInputField({
 
     if (setValue) {
       setValue(t);
-    } else {
-      Notify.error(
-        "setValue func undefined, check custom-field.input.tsx component",
-      );
     }
   };
 
@@ -67,7 +65,8 @@ export default function CustomInputField({
           alignItems: "center",
           width: "100%",
           paddingHorizontal: 8,
-          height: 35,
+          // height: 35,
+          marginVertical: 0,
         }}
       >
         {customLabel ? (
@@ -85,7 +84,7 @@ export default function CustomInputField({
           </>
         ) : (
           <TextInput
-            value={value}
+            value={val?.toString()}
             label={label}
             error={!!error}
             onChangeText={setData}
@@ -101,7 +100,7 @@ export default function CustomInputField({
             fontSize: 12,
             color: theme.colors?.error || "red",
             paddingHorizontal: 8,
-            marginTop: 2,
+            marginTop: 0,
             textAlign: "left",
           }}
         >

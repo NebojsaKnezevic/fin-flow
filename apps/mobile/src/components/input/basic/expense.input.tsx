@@ -7,18 +7,25 @@ import {
   Platform,
 } from "react-native";
 import ExpenseItems from "./expense-items/expense-item.input";
-import { useExpenseStore } from "../../../../store/expense.store";
+import {
+  ExpenseItemObj,
+  useExpenseStore,
+} from "../../../../store/expense.store";
 import { InsertExpense } from "@api/schema";
 import { Button, Text, TextInput, useTheme } from "react-native-paper";
 import CustomInputField from "./custom-field/custom-field.input";
 import { AppTheme } from "@/app/_layout";
 // import { QuickDatePicker } from "./custom-field/custom-date.input";
 import { Notify } from "../../../../helpers/toast.helper";
+import { useCreateExpense } from "../../../../hooks/mutations/useExpense";
 
 export default function Expense() {
   const theme: AppTheme = useTheme();
   const newExpense: InsertExpense = useExpenseStore((s) => s.expense);
   const setNewExpense = useExpenseStore((s) => s.setExpanse);
+  const expenseItems: ExpenseItemObj[] = useExpenseStore((s) => s.expenseItems);
+
+  const { mutate, isPending } = useCreateExpense();
 
   const items = useExpenseStore((s) => s.expenseItems);
   const isValid = useExpenseStore((s) => s.isValid);
@@ -98,23 +105,23 @@ export default function Expense() {
         <View
           style={{
             flexDirection: "row",
-            gap: 4,
+            gap: 16,
             width: "100%",
             justifyContent: "space-between",
           }}
         >
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 2 }}>
             <CustomInputField
               customLabel={false}
-              label="Total:"
+              label="Total: "
               val={newExpense.totalAmount}
             />
           </View>
 
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 2 }}>
             <CustomInputField
               customLabel={false}
-              label="Currency:"
+              label="Currency: "
               val={newExpense.currency}
               setValue={(val) =>
                 setNewExpense({ ...newExpense, currency: val })
@@ -125,10 +132,13 @@ export default function Expense() {
 
         <View style={{ flex: 1, alignItems: "center" }}>
           <Button
-            disabled={!isValid}
+            disabled={!isValid || isPending}
+            loading={isPending}
             mode="contained"
             elevation={2}
-            onPress={() => Notify.success("TO implement!")}
+            onPress={() =>
+              mutate({ ...newExpense, expenseItemList: expenseItems })
+            }
             style={styles.submitButton}
             textColor="white"
           >
@@ -276,6 +286,7 @@ const styles = StyleSheet.create({
     width: "25%",
     margin: 15,
     flex: 1,
+    marginTop: 12,
     // color: "white",
   },
 });

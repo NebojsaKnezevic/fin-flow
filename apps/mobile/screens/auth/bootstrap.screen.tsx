@@ -15,11 +15,10 @@ export default function AuthBootstrap() {
   const router = useRouter();
 
   const [token, setToken] = useState<string | null>(null);
-  const [isCheckingToken, setIsCheckingToken] = useState(true);
+  const [isReadingStore, setIsReadingStore] = useState(true);
 
   const authZustand = useAuthStore((state) => state.setAuth);
 
-  // 1. Read token from storage
   useEffect(() => {
     async function checkToken() {
       try {
@@ -27,19 +26,18 @@ export default function AuthBootstrap() {
         setToken(storedToken);
       } catch (e) {
         Notify.error("Error while reading SecureStore");
-        setIsCheckingToken(false);
+      } finally {
+        setIsReadingStore(false);
       }
-      // finally {
-      //   if (!storedToken) {
-      //     setIsCheckingToken(false);
-      //   }
-      // }
     }
     checkToken();
   }, []);
 
-  // 2. Fetch user data if token exists
-  const user = useQuery({
+  const {
+    data: userData,
+    isError,
+    isLoading: isQueryLoading,
+  } = useQuery({
     queryKey: ["authBootstrap", token],
     queryFn: async () => {
       const response = await apiClient.get("/auth/me");
@@ -50,25 +48,27 @@ export default function AuthBootstrap() {
   });
 
   useEffect(() => {
-    if (!isCheckingToken && !token) {
+    if (isReadingStore) return;
+
+    if (!token) {
       router.replace("/login");
       return;
     }
 
-    if (user.isError) {
+    if (isQueryLoading) return;
+
+    if (isError) {
       Notify.error("Session expired or server is down");
       router.replace("/login");
       return;
     }
 
-    if (user.data && token) {
-      authZustand(user.data, token);
-      Notify.success(`Logged in as ${user.data.email}`);
-      setTimeout(() => {
-        router.replace("/app");
-      }, 1000);
+    if (userData) {
+      authZustand(userData, token);
+      Notify.success(`Logged in as ${userData.email}`);
+      router.replace("/app");
     }
-  }, [isCheckingToken, token, user.isError, user.data]);
+  }, [isReadingStore, token, isQueryLoading, isError, userData]);
 
   return (
     <View style={styles.container}>

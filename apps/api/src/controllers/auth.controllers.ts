@@ -8,7 +8,7 @@ import { AppError } from "../errors/app.error";
 import jwt from "jsonwebtoken";
 
 export async function registerController(req: Request, res: Response) {
-  console.log("reg");
+  // console.log("reg");
   const validation = registerSchema.safeParse(req.body);
 
   if (!validation.success) {
@@ -94,7 +94,7 @@ export async function loginController(req: Request, res: Response) {
 }
 
 export async function meController(req: Request, res: Response) {
-  console.log("me");
+  // console.log("me");
   const authHeader = req.headers["authorization"];
 
   if (!authHeader || !authHeader.startsWith("Bearer "))

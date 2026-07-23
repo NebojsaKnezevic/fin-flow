@@ -97,7 +97,7 @@ export const expenses = pgTable("expenses", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const insertExpenseSchema = createInsertSchema(expenses).pick({
+export const baseExpenseSchema = createInsertSchema(expenses).pick({
   name: true,
   userId: true,
   source: true,
@@ -108,7 +108,7 @@ export const insertExpenseSchema = createInsertSchema(expenses).pick({
   merchant: true,
 });
 
-export type InsertExpense = z.infer<typeof insertExpenseSchema>;
+export type InsertExpense = z.infer<typeof baseExpenseSchema>;
 
 // ==========================================
 // 4. EXPENSE ITEMS TABELA
@@ -136,6 +136,12 @@ export const insertExpenseItemSchema = createInsertSchema(expenseItems).omit({
 });
 
 export type InsertExpenseItem = z.infer<typeof insertExpenseItemSchema>;
+export type InsertExpenseItemExtended = InsertExpenseItem & {
+  categories: number[];
+};
+export type InsertExpenseExtended = InsertExpense & {
+  expenseItemList: InsertExpenseItemExtended[];
+};
 
 // ==========================================
 // 5. EXPENSE ITEMS - CATEGORIES TABELA
