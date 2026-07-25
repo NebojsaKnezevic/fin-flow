@@ -5,8 +5,43 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1780136272213,
-      "tag": "0000_watery_husk",
+      "when": 1781977247337,
+      "tag": "0000_rich_hitman",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782230932196,
+      "tag": "0001_chubby_gamora",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783157734905,
+      "tag": "0002_tranquil_scrambler",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783173657415,
+      "tag": "0003_slimy_the_leader",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783174946334,
+      "tag": "0004_flaky_nuke",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783355085828,
+      "tag": "0005_regular_lily_hollister",
       "breakpoints": true
     }
   ]

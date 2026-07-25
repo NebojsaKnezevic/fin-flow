@@ -3,16 +3,17 @@ import { registerSchema, loginSchema } from "../schemas/auth.schema";
 import bcrypt from "bcrypt";
 import db from "../db/db";
 import { eq } from "drizzle-orm";
-import { users, UserWithId } from "../db/schemas/users";
+import { users, UserWithId } from "../db/schemas/schema";
 import { AppError } from "../errors/app.error";
 import jwt from "jsonwebtoken";
 
 export async function registerController(req: Request, res: Response) {
+  // console.log("reg");
   const validation = registerSchema.safeParse(req.body);
 
   if (!validation.success) {
-    const errs = validation.error.errors;
-    throw new AppError(400, errs.map((e) => e.message).join(", "));
+    const errs = validation.error;
+    throw new AppError(400, errs.message);
   }
 
   const { email, password } = validation.data;
@@ -42,8 +43,8 @@ export async function loginController(req: Request, res: Response) {
   const validation = loginSchema.safeParse(req.body);
 
   if (!validation.success) {
-    const err = validation.error.errors;
-    throw new AppError(400, err[0].message);
+    const err = validation.error;
+    throw new AppError(400, err.message);
   }
 
   const { email, password } = validation.data;
@@ -59,7 +60,7 @@ export async function loginController(req: Request, res: Response) {
     .limit(1)
     .then((res) => res[0]);
 
-  // console.log(user);
+  console.log(user);
 
   if (!user) {
     throw new AppError(401, "Invalid email or password.");
@@ -72,13 +73,46 @@ export async function loginController(req: Request, res: Response) {
   }
 
   const JWT_SECRET = process.env.JWT_SECRET || "asdasdasdadas@@@@";
-  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-    expiresIn: "1d",
-  });
+  const token = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      country: user.country,
+      birthday: user.birthday,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: "1d",
+    },
+  );
 
   res.status(200).json({
     message: "success",
     token,
     user: { id: user.id, email: user.email },
   });
+}
+
+export async function meController(req: Request, res: Response) {
+  // console.log("me");
+  const authHeader = req.headers["authorization"];
+
+  if (!authHeader || !authHeader.startsWith("Bearer "))
+    return res.status(401).json({ error: "Unauthorized: Missing token" });
+
+  const token = authHeader.split(" ")[1];
+  const JWT_SECRET = process.env.JWT_SECRET || "asdasdasdadas@@1@";
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as UserWithId & {
+      iat: number;
+      exp: number;
+    };
+
+    const { iat, exp, ...userProfile } = decoded;
+
+    res.status(200).json(userProfile);
+  } catch (error) {
+    res.status(401).json({ error: "Incorrect json token" });
+  }
 }

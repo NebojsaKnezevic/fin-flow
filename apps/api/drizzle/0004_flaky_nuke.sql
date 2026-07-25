@@ -1,0 +1,2 @@
+ALTER TABLE "expense_category" ADD COLUMN "parent_id" integer;--> statement-breakpoint
+ALTER TABLE "expense_category" ADD CONSTRAINT "expense_category_parent_id_expense_category_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."expense_category"("id") ON DELETE cascade ON UPDATE no action;

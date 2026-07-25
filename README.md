@@ -26,21 +26,21 @@ As a user, I want to create an account and log in so that my financial data is s
 - **AC:** User can log in to persist their session across app restarts.
 - **AC:** Protected routes/screens (Dashboard, Camera) are inaccessible without a valid session.
 
-### US-01 — Camera Capture
+### US-01 — Basic Input
+
+As a user, I want to manually enter expense details via a form as a fallback input method.
+
+### US-02 — Camera Input
 
 As a user, I want to photograph a receipt so that the app automatically extracts vendor, date, amount, and category via AI.
 
 - **Extracted data is reviewable and editable before saving.**
 
-### US-02 — Voice Input
+### US-03 — Voice Input (maybe?)
 
-As a user, I want to dictate an expense (e.g., "coffee 350 dinara") so that I can log it quickly without typing.
+As a user, I want to dictate an expense (e.g., "coffee 3$") so that I can log it quickly without typing.
 
 - **Extracted data is reviewable and editable before saving.**
-
-### US-03 — Manual Input
-
-As a user, I want to manually enter expense details via a form as a fallback input method.
 
 ### US-04 — Expense Timeline
 

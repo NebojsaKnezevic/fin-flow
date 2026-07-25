@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Redirect } from "expo-router";
 import { Text } from "react-native-paper";
 import { View } from "react-native";
 import useLoginScreenStyles from "./styles";
@@ -7,12 +6,18 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "../../client/client";
 import * as SecureStore from "expo-secure-store";
 import { Notify } from "../../helpers/toast.helper";
+import { useAuthStore } from "../../store/auth.store";
+import { UserWithId } from "@api/schema";
+import { useRouter } from "expo-router";
 
 export default function AuthBootstrap() {
   const styles = useLoginScreenStyles();
+  const router = useRouter();
 
   const [token, setToken] = useState<string | null>(null);
-  const [isCheckingToken, setIsCheckingToken] = useState(true);
+  const [isReadingStore, setIsReadingStore] = useState(true);
+
+  const authZustand = useAuthStore((state) => state.setAuth);
 
   useEffect(() => {
     async function checkToken() {
@@ -22,55 +27,54 @@ export default function AuthBootstrap() {
       } catch (e) {
         Notify.error("Error while reading SecureStore");
       } finally {
-        setIsCheckingToken(false);
+        setIsReadingStore(false);
       }
     }
     checkToken();
   }, []);
 
-  const user = useQuery({
+  const {
+    data: userData,
+    isError,
+    isLoading: isQueryLoading,
+  } = useQuery({
     queryKey: ["authBootstrap", token],
     queryFn: async () => {
       const response = await apiClient.get("/auth/me");
-      return response.data;
+      return response.data as UserWithId;
     },
     retry: false,
     enabled: !!token,
   });
 
   useEffect(() => {
-    if (user.isError) {
+    if (isReadingStore) return;
+
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+
+    if (isQueryLoading) return;
+
+    if (isError) {
       Notify.error("Session expired or server is down");
+      router.replace("/login");
+      return;
     }
-    if (user.data) {
-      Notify.success("Welcome back!");
-      // TO DO: save user in zustand
+
+    if (userData) {
+      authZustand(userData, token);
+      Notify.success(`Logged in as ${userData.email}`);
+      router.replace("/app");
     }
-  }, [user.isError, user.data]);
+  }, [isReadingStore, token, isQueryLoading, isError, userData]);
 
-  // ---- RENDER ----
-
-  if (isCheckingToken || (token && user.isLoading)) {
-    return (
-      <View style={styles.container}>
-        <Text variant="displayLarge" style={styles.title}>
-          Loading...
-        </Text>
-      </View>
-    );
-  }
-
-  if (!token) {
-    return <Redirect href="/login" />;
-  }
-
-  if (user.isError) {
-    return <Redirect href="/login" />;
-  }
-
-  if (user.data) {
-    // return <Redirect href="/dashboard" />;
-  }
-
-  return <Redirect href="/login" />;
+  return (
+    <View style={styles.container}>
+      <Text variant="displayLarge" style={styles.title}>
+        Loading...
+      </Text>
+    </View>
+  );
 }

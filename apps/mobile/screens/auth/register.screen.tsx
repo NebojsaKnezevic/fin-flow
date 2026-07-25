@@ -38,7 +38,7 @@ export default function RegisterScreen() {
       // else
       //   setErr(e.message);
       const serverMessage = (e.response?.data as any)?.message || e.message;
-      Notify.error(serverMessage, "Registration Failed");
+      Notify.error(JSON.stringify(e), "");
     },
   });
 
@@ -141,9 +141,9 @@ export default function RegisterScreen() {
           style={styles.input}
         />
 
-        <Button 
-          mode="contained" 
-          onPress={handleRegister} 
+        <Button
+          mode="contained"
+          onPress={handleRegister}
           loading={mutation.isPending}
           disabled={mutation.isPending}
           style={styles.button}

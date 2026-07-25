@@ -2,12 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { AppError } from "../errors/app.error";
 import dotenv from "dotenv";
-import { UserWithId } from "../db/schemas/users";
+import { UserWithId } from "../db/schemas/schema";
+// import { UserWithId } from "../db/schemas/users";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: UserWithId;
+      user: UserWithId;
     }
   }
 }
@@ -39,7 +40,7 @@ export default function authMiddleware(
 
   try {
     const decoded = jwt.verify(token, jwtSecret) as UserWithId;
-    req.user = { id: decoded.id, email: decoded.email };
+    req.user = decoded;
     next();
   } catch (error) {
     throw new AppError(401, "Expired or invalid token");

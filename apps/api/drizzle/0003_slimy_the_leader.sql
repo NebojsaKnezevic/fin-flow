@@ -1,0 +1,1 @@
+DROP TABLE "expense_sub_category" CASCADE;
