@@ -7,11 +7,13 @@ import {
   expenses,
   InsertExpense,
   InsertExpenseExtended,
+  insertExpenseExtendedSchema,
 } from "../db/schemas/schema";
 import db from "../db/db";
 import { aliasedTable, count, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { union } from "drizzle-orm/pg-core";
 import { formatCategoriesToTree } from "../../helpers/category.helper";
+import { z } from "zod";
 
 export async function expenseController(req: Request, res: Response) {
   const page = parseInt(req.query.page as string) || 1;
@@ -64,11 +66,21 @@ export async function categoryController(req: Request, res: Response) {
 }
 
 export async function createExpenseController(req: Request, res: Response) {
-  const body = req.body as InsertExpenseExtended;
-  const { id, expenseItemList = [], ...expenseData } = body;
+  req.body.userId = req.user.id;
+  console.log(req.body);
+  const parsed = insertExpenseExtendedSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    const tree = z.treeifyError(parsed.error);
+    console.log(`Validation failed: ${JSON.stringify(tree, null, 2)}`);
+    throw new AppError(400, `Validation failed: ${JSON.stringify(tree)}`);
+  }
+
+  // const body = req.body as InsertExpenseExtended;
+  const { expenseItemList = [], ...expenseData } = parsed.data;
   expenseData.userId = req.user.id;
-  console.log(expenseItemList);
-  console.log(expenseData);
+  // console.log(expenseItemList);
+  // console.log(expenseData);
 
   const allGood = await db.transaction(async (t) => {
     //====================================
@@ -120,5 +132,5 @@ export async function createExpenseController(req: Request, res: Response) {
     };
   });
 
-  return res.status(200).json(allGood);
+  return res.status(201).json(allGood);
 }

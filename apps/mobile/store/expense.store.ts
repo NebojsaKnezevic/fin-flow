@@ -23,7 +23,7 @@ interface ExpenseState {
 export const useExpenseStore = create<ExpenseState>((set) => {
   return {
     expense: {
-      id: "",
+      // id: "",
       userId: "",
 
       source: "basic",

@@ -75,7 +75,7 @@ export type ExpenseSource = z.infer<typeof expenseSourceSchema>;
 
 export const expenses = pgTable("expenses", {
   id: uuid("id").defaultRandom().primaryKey(),
-  name: text().default(""),
+  name: text("name").default(""),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -84,20 +84,17 @@ export const expenses = pgTable("expenses", {
   currency: text("currency").notNull().default("USD"),
   merchant: text("merchant"),
 
-  // categoryId: integer("category_id")
-  //   .notNull()
-  //   .references(() => expenseCategory.id, { onDelete: "restrict" }),
-
   note: text("note"),
   source: expenseSourceEnum("source").notNull(),
 
-  occuredAt: timestamp("occured_at").notNull(),
-
+  occuredAt: timestamp("occured_at", { mode: "date" }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const baseExpenseSchema = createInsertSchema(expenses).pick({
+export const baseExpenseSchema = createInsertSchema(expenses, {
+  occuredAt: z.coerce.date(),
+}).pick({
   name: true,
   userId: true,
   source: true,
@@ -115,11 +112,11 @@ export type InsertExpense = z.infer<typeof baseExpenseSchema>;
 // ==========================================
 
 export const expenseItems = pgTable("expense_items", (t) => ({
-  id: t.uuid().defaultRandom().primaryKey(),
+  id: t.uuid("id").defaultRandom().primaryKey(),
   //IZBACICU NAME!!!!!!!!!
   // name: t.text().notNull(),
-  price: t.doublePrecision().notNull(),
-  quantity: t.doublePrecision().notNull(),
+  price: t.numeric("price").notNull(),
+  quantity: t.numeric("quantity").notNull(),
   // categoryId: t
   //   .integer("category_id")
   //   .notNull()
@@ -136,13 +133,22 @@ export const insertExpenseItemSchema = createInsertSchema(expenseItems).omit({
 });
 
 export type InsertExpenseItem = z.infer<typeof insertExpenseItemSchema>;
-export type InsertExpenseItemExtended = InsertExpenseItem & {
-  categories: number[];
-};
-export type InsertExpenseExtended = InsertExpense & {
-  expenseItemList: InsertExpenseItemExtended[];
-};
+export const insertExpenseItemExtendedSchema = insertExpenseItemSchema.extend({
+  categories: z
+    .array(z.number())
+    .min(1, "Expense item must have at least 1 category"),
+});
 
+export const insertExpenseExtendedSchema = baseExpenseSchema.extend({
+  expenseItemList: z
+    .array(insertExpenseItemExtendedSchema)
+    .min(1, "Expense must have at least 1 item"),
+});
+
+export type InsertExpenseItemExtended = z.infer<
+  typeof insertExpenseItemExtendedSchema
+>;
+export type InsertExpenseExtended = z.infer<typeof insertExpenseExtendedSchema>;
 // ==========================================
 // 5. EXPENSE ITEMS - CATEGORIES TABELA
 // ==========================================
