@@ -2,6 +2,7 @@ import * as React from "react";
 import { BottomNavigation } from "react-native-paper";
 import InputScreen from "../../screens/input/input.screen";
 import { useState } from "react";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 const InputsRoute = () => <InputScreen />;
 
@@ -22,10 +23,12 @@ export default function App() {
   });
 
   return (
-    <BottomNavigation
-      navigationState={{ index, routes }}
-      onIndexChange={setIndex}
-      renderScene={renderScene}
-    />
+    <KeyboardProvider>
+      <BottomNavigation
+        navigationState={{ index, routes }}
+        onIndexChange={setIndex}
+        renderScene={renderScene}
+      />
+    </KeyboardProvider>
   );
 }

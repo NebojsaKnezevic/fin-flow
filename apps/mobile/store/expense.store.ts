@@ -18,6 +18,11 @@ interface ExpenseState {
   removeExpenseItem: (index: number) => void;
   updateExpenseItem: (index: number, item: ExpenseItemObj) => void;
   setValid: (x: boolean) => void;
+
+  aiTextInput: string;
+  setAiTextInput: (s: string) => void;
+  isLoading: boolean;
+  setIsLoading: (b: boolean) => void;
 }
 
 export const useExpenseStore = create<ExpenseState>((set) => {
@@ -53,5 +58,10 @@ export const useExpenseStore = create<ExpenseState>((set) => {
       }),
 
     setValid: (x: boolean) => set({ isValid: x }),
+
+    aiTextInput: "",
+    setAiTextInput: (s: string) => set({ aiTextInput: s }),
+    isLoading: false,
+    setIsLoading: (b: boolean) => set({ isLoading: b }),
   };
 });

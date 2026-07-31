@@ -1,27 +1,43 @@
-import { Text } from "react-native-paper";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { Text, TextInput, useTheme } from "react-native-paper";
+import { View, StyleSheet, ScrollView, Platform } from "react-native";
 import InputTabs from "@/components/input/tabs.input";
 // import InputForm from "@/components/input/basic/form.input";
 // import { insertExpenseSchema } from "@api/schema";
 // import ExpenseList from "@/components/input/basic/list.input";
 import Expense from "@/components/input/basic/expense.input";
+import { useState } from "react";
+import ExpenseAI from "@/components/input/ai/expense.ai";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 
 export default function InputScreen() {
   // const keys: string[] = Object.keys(insertExpenseSchema.shape);
+  const [value, setValue] = useState<string>("basic");
+
+  // const handleSend = () => {
+  //   if (text.trim() && !isLoading) {
+  //     onSubmit(text.trim());
+  //     setText("");
+  //   }
+  // };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+    >
       <View style={styles.tabWrapper}>
-        <InputTabs />
+        <InputTabs value={value} setValue={(x: string) => setValue(x)} />
       </View>
 
       <View style={styles.content}>
         {/* <Text variant="headlineLarge">Welcome back! </Text> */}
 
         {/* <ExpenseList /> */}
-        <Expense />
+        {value.toLowerCase() === "basic" && <Expense />}
+        {value.toLowerCase() === "ai" && <ExpenseAI />}
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

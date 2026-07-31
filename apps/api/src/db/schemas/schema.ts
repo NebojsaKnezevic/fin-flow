@@ -66,8 +66,9 @@ export type InsertExpenseCategory = z.infer<typeof insertExpenseCategorySchema>;
 // ==========================================
 export const expenseSourceEnum = pgEnum("expense_source", [
   "basic",
-  "camera",
-  "voice",
+  "ai",
+  // "camera",
+  // "voice",
 ]);
 
 export const expenseSourceSchema = z.enum(expenseSourceEnum.enumValues);

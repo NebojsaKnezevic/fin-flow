@@ -8,13 +8,17 @@ type ExpenseSource = (typeof expenseSourceEnum.enumValues)[number];
 
 const modeConfig: Record<ExpenseSource, { label: string; icon: string }> = {
   basic: { label: "Basic", icon: "pencil" },
-  camera: { label: "Camera", icon: "camera" },
-  voice: { label: "Voice", icon: "microphone" },
+  ai: { label: "AI", icon: "creation" },
 };
 
-const InputTabs = () => {
+type Props = {
+  value: string;
+  setValue: (x: string) => void;
+};
+
+const InputTabs = ({ value, setValue }: Props) => {
   const options = expenseSourceEnum.enumValues;
-  const [value, setValue] = useState<string>(options[0]);
+  // const [value, setValue] = useState<string>(options[0]);
 
   return (
     <SafeAreaView style={styles.container}>

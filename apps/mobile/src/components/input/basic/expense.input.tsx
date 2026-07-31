@@ -52,11 +52,13 @@ export default function Expense() {
         keyboardShouldPersistTaps="handled"
       >
         {/* <Text>{JSON.stringify(newExpense)}</Text> */}
+
         <CustomInputField
           label="Receipt Name:"
           val={newExpense.name}
           setValue={(val) => setNewExpense({ ...newExpense, name: val })}
         />
+        {/* TO DO - Make this a dropdown */}
         <CustomInputField
           label="Merchant:"
           val={newExpense.merchant}
@@ -72,6 +74,7 @@ export default function Expense() {
           val={newExpense.occuredAt.toLocaleDateString("US")}
         /> */}
 
+        {/* TO DO - More love to this one */}
         <CustomInputField
           label="Occured At:"
           val={newExpense.occuredAt.toLocaleDateString()}
@@ -99,7 +102,7 @@ export default function Expense() {
         />
 
         {/* <QuickDatePicker /> */}
-
+        {/* TO DO - Definetly more love here */}
         <ExpenseItems />
 
         <View
@@ -119,6 +122,7 @@ export default function Expense() {
           </View>
 
           <View style={{ flex: 2 }}>
+            {/* TO DO - Make this a dropdown */}
             <CustomInputField
               customLabel={false}
               label="Currency: "
