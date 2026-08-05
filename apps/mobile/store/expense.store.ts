@@ -1,13 +1,9 @@
-import {
-  InsertExpense,
-  InsertExpenseItem,
-  InsertExpenseCategory,
-} from "@api/schema";
+import { InsertExpense, ExpenseItemObj } from "@repo/models";
 import { create } from "zustand";
 
-export type ExpenseItemObj = InsertExpenseItem & {
-  categories: number[];
-};
+// export type ExpenseItemObj = InsertExpenseItem & {
+//   categories: number[];
+// };
 
 interface ExpenseState {
   expense: InsertExpense;

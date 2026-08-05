@@ -39,14 +39,11 @@
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "drizzle-orm": "^0.45.2",
-    "drizzle-zod": "^0.8.3",
     "expo": "~55.0.24",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.21.0",
     "react": "19.2.0",
-    "react-native": "0.83.6",
-    "zod": "4.4.3"
+    "react-native": "0.83.6"
   }
 }

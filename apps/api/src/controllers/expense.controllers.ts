@@ -8,7 +8,7 @@ import {
   InsertExpense,
   InsertExpenseExtended,
   insertExpenseExtendedSchema,
-} from "../db/schemas/schema";
+} from "@repo/models";
 import db from "../db/db";
 import { aliasedTable, count, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { union } from "drizzle-orm/pg-core";
