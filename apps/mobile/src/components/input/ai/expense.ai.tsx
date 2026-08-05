@@ -8,6 +8,7 @@ import {
 } from "react-native-paper";
 import { useExpenseStore } from "../../../../store/expense.store";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { useCreateExpenseAI } from "../../../../hooks/mutations/useExpense";
 
 export default function ExpenseAI(): JSX.Element {
   const isLoading = useExpenseStore((s) => s.isLoading);
@@ -15,12 +16,15 @@ export default function ExpenseAI(): JSX.Element {
   const setText = useExpenseStore((s) => s.setAiTextInput);
   const theme = useTheme();
 
+  const sendAiInput = useCreateExpenseAI();
+
   return (
     <View
       style={styles.inner}
       //   behavior={Platform.OS === "ios" ? "padding" : "height"}
       //   keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
+      <Text style={{ color: "white", marginTop: 150 }}>{text}</Text>
       {/* LOADER */}
       <View style={styles.contentContainer}>
         {isLoading && (
@@ -55,8 +59,13 @@ export default function ExpenseAI(): JSX.Element {
             <TextInput.Icon
               icon="send"
               disabled={!text.trim() || isLoading}
+              onPress={() => {
+                sendAiInput.mutate(text, {
+                  onSuccess: () => setText(""),
+                });
+              }}
               color={
-                text.trim() && !isLoading
+                text.trim() && !sendAiInput.isPending
                   ? theme.colors.primary
                   : theme.colors.outline
               }

@@ -12,8 +12,11 @@ import {
 import db from "../db/db";
 import { aliasedTable, count, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { union } from "drizzle-orm/pg-core";
-import { formatCategoriesToTree } from "../../helpers/category.helper";
+// import { formatCategoriesToTree } from "../../helpers/category.helper";
 import { z } from "zod";
+// import { aiService } from "../../services/ai.services.ts";
+import fs from "fs/promises";
+import { aiService } from "../../services/ai.services";
 
 export async function expenseController(req: Request, res: Response) {
   const page = parseInt(req.query.page as string) || 1;
@@ -65,9 +68,34 @@ export async function categoryController(req: Request, res: Response) {
   return res.status(200).json(result);
 }
 
+export async function aiController(req: Request, res: Response) {
+  const userId = req.user.id;
+  const prompt = req.body.prompt;
+
+  // const expenseImg = await fs.readFile('/home/nebo/Downloads/black-white-vector-illustration-receipt-template_97886-8.webp')
+  // const imgBase64 = expenseImg.toString('base64');
+
+  const categories = await db
+    .select()
+    .from(expenseCategory)
+    .where(
+      or(eq(expenseCategory.userId, userId), isNull(expenseCategory.parentId)),
+    );
+
+  const response = await aiService.analyze(
+    prompt +
+      " vrati json, dole su ti kateorije usera, " +
+      categories.map((c) => c.category).join(","),
+    "/home/nebo/Downloads/receipt.webp",
+  );
+
+  console.log(response);
+  return res.status(200).json(response);
+}
+
 export async function createExpenseController(req: Request, res: Response) {
   req.body.userId = req.user.id;
-  console.log(req.body);
+  // console.log(req.body);
   const parsed = insertExpenseExtendedSchema.safeParse(req.body);
 
   if (!parsed.success) {

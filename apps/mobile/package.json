@@ -2,6 +2,9 @@
   "name": "FinFlow",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "exports": {
+    "./store/*": "./store/*"
+  },
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
