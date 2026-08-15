@@ -2,7 +2,7 @@ import * as React from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
 import { SegmentedButtons } from "react-native-paper";
 import { useState } from "react";
-import { expenseSourceEnum } from "@api/schema";
+import { expenseSourceEnum } from "@repo/models";
 
 type ExpenseSource = (typeof expenseSourceEnum.enumValues)[number];
 

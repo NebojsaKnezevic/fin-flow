@@ -1,4 +1,4 @@
-import { InsertExpense, ExpenseItemObj } from "@repo/models";
+import { InsertExpense, InsertExpenseItemExtended } from "@repo/models";
 import { create } from "zustand";
 
 // export type ExpenseItemObj = InsertExpenseItem & {
@@ -7,12 +7,12 @@ import { create } from "zustand";
 
 interface ExpenseState {
   expense: InsertExpense;
-  expenseItems: ExpenseItemObj[];
+  expenseItems: InsertExpenseItemExtended[];
   isValid: boolean;
   setExpanse: (e: InsertExpense) => void;
-  addExpenseItem: (ei: ExpenseItemObj) => void;
+  addExpenseItem: (ei: InsertExpenseItemExtended) => void;
   removeExpenseItem: (index: number) => void;
-  updateExpenseItem: (index: number, item: ExpenseItemObj) => void;
+  updateExpenseItem: (index: number, item: InsertExpenseItemExtended) => void;
   setValid: (x: boolean) => void;
 
   aiTextInput: string;
@@ -37,7 +37,7 @@ export const useExpenseStore = create<ExpenseState>((set) => {
 
     setExpanse: (e: InsertExpense) => set({ expense: e }),
 
-    addExpenseItem: (ei: ExpenseItemObj) =>
+    addExpenseItem: (ei: InsertExpenseItemExtended) =>
       set((state) => ({ expenseItems: [...state.expenseItems, ei] })),
 
     removeExpenseItem: (index: number) =>
@@ -45,7 +45,7 @@ export const useExpenseStore = create<ExpenseState>((set) => {
         expenseItems: s.expenseItems.filter((_, i) => index !== i),
       })),
 
-    updateExpenseItem: (index: number, item: ExpenseItemObj) =>
+    updateExpenseItem: (index: number, item: InsertExpenseItemExtended) =>
       set((s) => {
         s.expenseItems[index] = item;
         return {

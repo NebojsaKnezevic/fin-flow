@@ -1,6 +1,7 @@
 import app from "./index";
 import dotenv from "dotenv";
 import os from "os";
+import { getJsonSchema, insertExpenseItemExtendedSchema } from "@repo/models";
 
 function getLocalIpAddress() {
   const interfaces = os.networkInterfaces();

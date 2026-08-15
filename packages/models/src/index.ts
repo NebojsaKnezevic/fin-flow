@@ -14,6 +14,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 export * from "./types";
+export * from "./zod-to-json";
 
 // ==========================================
 // 1. USERS TABELA
@@ -60,6 +61,7 @@ export const insertExpenseCategorySchema = createInsertSchema(
   expenseCategory,
 ).omit({
   id: true,
+  userId: true,
 });
 export type InsertExpenseCategory = z.infer<typeof insertExpenseCategorySchema>;
 
@@ -139,12 +141,15 @@ export const insertExpenseItemExtendedSchema = insertExpenseItemSchema.extend({
   categories: z
     .array(z.number())
     .min(1, "Expense item must have at least 1 category"),
+  newCategory: insertExpenseCategorySchema.nullable(),
 });
 
+export const expenseItemListSchema = z
+  .array(insertExpenseItemExtendedSchema)
+  .min(1, "Expense must have at least 1 item");
+
 export const insertExpenseExtendedSchema = baseExpenseSchema.extend({
-  expenseItemList: z
-    .array(insertExpenseItemExtendedSchema)
-    .min(1, "Expense must have at least 1 item"),
+  expenseItemList: expenseItemListSchema,
 });
 
 export type InsertExpenseItemExtended = z.infer<

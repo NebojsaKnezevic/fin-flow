@@ -14,9 +14,10 @@ import { aliasedTable, count, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { union } from "drizzle-orm/pg-core";
 // import { formatCategoriesToTree } from "../../helpers/category.helper";
 import { z } from "zod";
-// import { aiService } from "../../services/ai.services.ts";
-import fs from "fs/promises";
-import { aiService } from "../../services/ai.services";
+
+import { aiService } from "../services/ai.service";
+import { getJsonSchema, insertExpenseItemExtendedSchema } from "@repo/models";
+import { categoryService, expenseService } from "../services/expense.service";
 
 export async function expenseController(req: Request, res: Response) {
   const page = parseInt(req.query.page as string) || 1;
@@ -58,12 +59,7 @@ export async function expenseController(req: Request, res: Response) {
 export async function categoryController(req: Request, res: Response) {
   const userId = req.user?.id || (req.query.userId as string);
 
-  const result = await db
-    .select()
-    .from(expenseCategory)
-    .where(
-      or(eq(expenseCategory.userId, userId), isNull(expenseCategory.parentId)),
-    );
+  const result = await categoryService.getCategoriesForUser(userId);
 
   return res.status(200).json(result);
 }
@@ -72,25 +68,35 @@ export async function aiController(req: Request, res: Response) {
   const userId = req.user.id;
   const prompt = req.body.prompt;
 
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
   // const expenseImg = await fs.readFile('/home/nebo/Downloads/black-white-vector-illustration-receipt-template_97886-8.webp')
   // const imgBase64 = expenseImg.toString('base64');
 
-  const categories = await db
-    .select()
-    .from(expenseCategory)
-    .where(
-      or(eq(expenseCategory.userId, userId), isNull(expenseCategory.parentId)),
-    );
-
-  const response = await aiService.analyze(
-    prompt +
-      " vrati json, dole su ti kateorije usera, " +
-      categories.map((c) => c.category).join(","),
+  const responseSSE = expenseService.processExpenseWithAI(
+    userId,
+    prompt,
     "/home/nebo/Downloads/receipt.webp",
   );
 
-  console.log(response);
-  return res.status(200).json(response);
+  for await (const event of responseSSE) {
+    const payload =
+      typeof event.data === "string" ? event.data : JSON.stringify(event.data);
+    // console.log(`event: ${event.packet}\n`);
+    // console.log(`data: ${payload}\n\n`);
+    console.log(event);
+    res.write(`event: ${event.packet}\n`);
+    res.write(`data: ${payload}\n\n`);
+  }
+
+  res.write("SSE end");
+  res.end();
+  // console.log(response.output_text);
+  // console.log(response);
+  // return res.status(200).json(response);
 }
 
 export async function createExpenseController(req: Request, res: Response) {

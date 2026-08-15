@@ -8,6 +8,10 @@ export function globalErrorHandler(
   res: Response,
   next: NextFunction,
 ) {
+  if (res.headersSent) {
+    return next(err);
+  }
+
   const dbError =
     err.cause instanceof DatabaseError
       ? err.cause
