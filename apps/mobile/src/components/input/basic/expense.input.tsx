@@ -8,10 +8,14 @@ import {
 } from "react-native";
 import ExpenseItems from "./expense-items/expense-item.input";
 import {
-  ExpenseItemObj,
+  // ExpenseItemObj,
   useExpenseStore,
 } from "../../../../store/expense.store";
-import { InsertExpense } from "@api/schema";
+import {
+  InsertExpense,
+  InsertExpenseExtended,
+  InsertExpenseItemExtended,
+} from "@repo/models";
 import { Button, Text, TextInput, useTheme } from "react-native-paper";
 import CustomInputField from "./custom-field/custom-field.input";
 import { AppTheme } from "@/app/_layout";
@@ -21,13 +25,15 @@ import { useCreateExpense } from "../../../../hooks/mutations/useExpense";
 
 export default function Expense() {
   const theme: AppTheme = useTheme();
-  const newExpense: InsertExpense = useExpenseStore((s) => s.expense);
+  const newExpense: InsertExpenseExtended = useExpenseStore((s) => s.expense);
   const setNewExpense = useExpenseStore((s) => s.setExpanse);
-  const expenseItems: ExpenseItemObj[] = useExpenseStore((s) => s.expenseItems);
+  const expenseItems: InsertExpenseItemExtended[] = useExpenseStore(
+    (s) => s.expense.expenseItemList,
+  );
 
   const { mutate, isPending } = useCreateExpense();
 
-  const items = useExpenseStore((s) => s.expenseItems);
+  const items = useExpenseStore((s) => s.expense.expenseItemList);
   const isValid = useExpenseStore((s) => s.isValid);
 
   React.useEffect(() => {

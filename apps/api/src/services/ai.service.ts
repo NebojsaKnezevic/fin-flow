@@ -81,7 +81,7 @@ export class AIService {
     });
 
     for await (const chunk of responseStream) {
-      console.log(chunk);
+      // console.log(chunk);
       yield chunk;
     }
   }

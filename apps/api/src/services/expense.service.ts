@@ -39,7 +39,7 @@ export const expenseService = {
     //validate
     baseExpenseSchema.parse(JSON.parse(parsedExpense.output_text || "{}"));
     //yield
-    yield { packet: "expense", data: parsedExpense.output_text };
+    yield { packet: "expense", data: parsedExpense };
 
     const categories = await categoryService.getCategoriesForUser(userId);
 
@@ -59,12 +59,12 @@ export const expenseService = {
 
     for await (const chunk of parsedExpenseItems) {
       //   console.log("STREAM CHUNK:", JSON.stringify(chunk, null, 2));
-      if (chunk.event_type === "step.delta" && chunk.delta?.type === "text") {
-        yield {
-          packet: "expense-items",
-          data: chunk.delta.text,
-        };
-      }
+      //   if (chunk.event_type === "step.delta" && chunk.delta?.type === "text") {
+      yield {
+        packet: "expense-items",
+        data: chunk,
+      };
+      //   }
     }
 
     yield { packet: "expense-items-end", data: null };

@@ -3,9 +3,9 @@ import { StyleSheet, Text, View } from "react-native";
 import { MultiSelect } from "react-native-element-dropdown";
 import { useTheme } from "react-native-paper";
 import { AppTheme } from "@/app/_layout";
-import { ExpenseCategory } from "@api/schema";
+import { ExpenseCategory, InsertExpenseItemExtended } from "@repo/models";
 import {
-  ExpenseItemObj,
+  // ExpenseItemObj,
   useExpenseStore,
 } from "../../../../../../store/expense.store";
 import CategoryHelpers from "../../../../../../helpers/category.helpers";
@@ -13,7 +13,7 @@ import { useCategories } from "../../../../../../hooks/queries/useCategories";
 
 interface DropdownPrimerProps {
   // categories: ExpenseCategory[];
-  item: ExpenseItemObj;
+  item: InsertExpenseItemExtended;
   index: number;
 }
 
@@ -45,11 +45,6 @@ const SearchDropDown = ({ item, index }: DropdownPrimerProps) => {
         categories: item.categories.filter((x) => !descendantsId.includes(x)),
       });
     } else {
-      // updateItemInStore(index, {
-      //   ...item,
-      //   categories: [...item.categories, catId],
-      // });
-
       updateItemInStore(index, {
         ...item,
         // categories: [...item.categories, cat.id],
@@ -60,10 +55,6 @@ const SearchDropDown = ({ item, index }: DropdownPrimerProps) => {
             catId,
           ]),
         ],
-        //   categories: [
-        //     cat.id,
-        //     ...getParents(cat.id, categoriesOG),
-        //   ].reverse(),
       });
     }
   };

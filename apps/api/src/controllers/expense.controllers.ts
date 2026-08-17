@@ -18,6 +18,7 @@ import { z } from "zod";
 import { aiService } from "../services/ai.service";
 import { getJsonSchema, insertExpenseItemExtendedSchema } from "@repo/models";
 import { categoryService, expenseService } from "../services/expense.service";
+import fs from "fs/promises";
 
 export async function expenseController(req: Request, res: Response) {
   const page = parseInt(req.query.page as string) || 1;
@@ -64,39 +65,73 @@ export async function categoryController(req: Request, res: Response) {
   return res.status(200).json(result);
 }
 
+// export async function aiController(req: Request, res: Response) {
+//   const userId = req.user.id;
+//   const prompt = req.body.prompt;
+
+//   res.setHeader("Content-Type", "text/event-stream");
+//   res.setHeader("Cache-Control", "no-cache");
+//   res.setHeader("Connection", "keep-alive");
+//   res.flushHeaders();
+
+//   // const expenseImg = await fs.readFile('/home/nebo/Downloads/black-white-vector-illustration-receipt-template_97886-8.webp')
+//   // const imgBase64 = expenseImg.toString('base64');
+
+//   const responseSSE = expenseService.processExpenseWithAI(
+//     userId,
+//     prompt,
+//     "/home/nebo/Downloads/receipt.webp",
+//   );
+
+//   for await (const event of responseSSE) {
+//     const payload =
+//       typeof event.data === "string" ? event.data : JSON.stringify(event.data);
+//     // console.log(`event: ${event.packet}\n`);
+//     // console.log(`data: ${payload}\n\n`);
+//     console.log(event);
+//     res.write(`event: ${event.packet}\n`);
+//     res.write(`data: ${payload}\n\n`);
+//   }
+
+//   // res.write("SSE end");
+//   res.end();
+//   // console.log(response.output_text);
+//   // console.log(response);
+//   // return res.status(200).json(response);
+// }
+
 export async function aiController(req: Request, res: Response) {
   const userId = req.user.id;
   const prompt = req.body.prompt;
 
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-  res.flushHeaders();
-
   // const expenseImg = await fs.readFile('/home/nebo/Downloads/black-white-vector-illustration-receipt-template_97886-8.webp')
   // const imgBase64 = expenseImg.toString('base64');
 
-  const responseSSE = expenseService.processExpenseWithAI(
-    userId,
-    prompt,
-    "/home/nebo/Downloads/receipt.webp",
-  );
+  const start = Date.now();
 
-  for await (const event of responseSSE) {
-    const payload =
-      typeof event.data === "string" ? event.data : JSON.stringify(event.data);
-    // console.log(`event: ${event.packet}\n`);
-    // console.log(`data: ${payload}\n\n`);
-    console.log(event);
-    res.write(`event: ${event.packet}\n`);
-    res.write(`data: ${payload}\n\n`);
-  }
+  const categories = await categoryService.getCategoriesForUser(userId);
 
-  res.write("SSE end");
-  res.end();
-  // console.log(response.output_text);
-  // console.log(response);
-  // return res.status(200).json(response);
+  const promptExpense =
+    "Extract basic metadata: merchant name, total amount, currency, and date.";
+
+  const promptExpenseItems = `${prompt} ${promptExpense}
+      You got the list of categories.
+      1. Every expense item must be categoryzed as new category.
+      2. New category should recieve proper parent if it makes sense.
+      ${JSON.stringify(categories.map((x) => ({ ...x, userId: "" }))).replace(" ", "")}`;
+
+  const response = await aiService.analyzePrompt({
+    model: "gemini-3.6-flash",
+    prompt: promptExpenseItems,
+    schema: insertExpenseExtendedSchema,
+    imgPath: "/home/nebo/Downloads/receipt.webp",
+  });
+
+  const end = Date.now();
+  console.log(`Duration: ${(end - start) / 1000.0}s`);
+  console.log(response);
+
+  return res.status(200).json(response);
 }
 
 export async function createExpenseController(req: Request, res: Response) {
