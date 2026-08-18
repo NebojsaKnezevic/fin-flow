@@ -22,6 +22,8 @@ interface ExpenseState {
   setAiTextInput: (s: string) => void;
   isLoading: boolean;
   setIsLoading: (b: boolean) => void;
+  imageBase64?: string;
+  setImage64: (bi64: string) => void;
 }
 
 export const defaultExpense: InsertExpenseExtended = {
@@ -85,5 +87,8 @@ export const useExpenseStore = create<ExpenseState>((set) => {
     setAiTextInput: (s: string) => set({ aiTextInput: s }),
     isLoading: false,
     setIsLoading: (b: boolean) => set({ isLoading: b }),
+
+    aiImage64: "",
+    setImage64: (bi64: string) => set({ imageBase64: bi64 }),
   };
 });

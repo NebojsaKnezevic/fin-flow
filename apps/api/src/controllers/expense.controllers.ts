@@ -8,6 +8,7 @@ import {
   InsertExpense,
   InsertExpenseExtended,
   insertExpenseExtendedSchema,
+  aiExpenseExtractionSchema,
 } from "@repo/models";
 import db from "../db/db";
 import { aliasedTable, count, desc, eq, isNull, or, sql } from "drizzle-orm";
@@ -17,7 +18,7 @@ import { z } from "zod";
 
 import { aiService } from "../services/ai.service";
 import { getJsonSchema, insertExpenseItemExtendedSchema } from "@repo/models";
-import { categoryService, expenseService } from "../services/expense.service";
+import { categoryService } from "../services/expense.service";
 import fs from "fs/promises";
 
 export async function expenseController(req: Request, res: Response) {
@@ -103,35 +104,50 @@ export async function categoryController(req: Request, res: Response) {
 export async function aiController(req: Request, res: Response) {
   const userId = req.user.id;
   const prompt = req.body.prompt;
+  let image = req.body.image;
 
-  // const expenseImg = await fs.readFile('/home/nebo/Downloads/black-white-vector-illustration-receipt-template_97886-8.webp')
-  // const imgBase64 = expenseImg.toString('base64');
+  console.log("Image received! Base64 character length:", image.length);
+
+  const rawHeader = req.headers["x-image-mime-type"];
+  const mimeType = Array.isArray(rawHeader)
+    ? rawHeader[0]
+    : rawHeader || "image/jpeg";
 
   const start = Date.now();
 
   const categories = await categoryService.getCategoriesForUser(userId);
 
-  const promptExpense =
-    "Extract basic metadata: merchant name, total amount, currency, and date.";
+  //   const promptExpense = `### TASK 1: GENERAL METADATA EXTRACTION (CRITICAL)
+  // First, carefully read the receipt and extract:
+  // - Merchant/Store Name
+  // - Total Amount
+  // - Currency (e.g., RSD, EUR, USD)
+  // - Transaction Date`;
 
-  const promptExpenseItems = `${prompt} ${promptExpense}
-      You got the list of categories.
-      1. Every expense item must be categoryzed as new category.
-      2. New category should recieve proper parent if it makes sense.
-      ${JSON.stringify(categories.map((x) => ({ ...x, userId: "" }))).replace(" ", "")}`;
+  const promptExpenseItems = `You can get all sorts of sources, pure receipts from hand written or user inserted data which will be provided below.
+  TASKs: 
+  -Try to extract basic info, such as merchant, currency, receipt name, if you can't than make suggestion.
+  -Try to extract singular items as per schema. If you cant find it, make a new one and provide him with parent from the list below...
+  -Currently newCategory is an actually name of the expense item. I need them all always.
+  CATEGORIES:
+  ${JSON.stringify(categories.map((x) => ({ ...x, userId: "" }))).replaceAll(" ", "")}
+  USER PROMPT:
+  ${prompt}
+`;
 
   const response = await aiService.analyzePrompt({
-    model: "gemini-3.6-flash",
+    model: "gemini-3.5-flash",
     prompt: promptExpenseItems,
-    schema: insertExpenseExtendedSchema,
-    imgPath: "/home/nebo/Downloads/receipt.webp",
+    schema: aiExpenseExtractionSchema,
+    img: image,
+    imgMime: mimeType,
   });
 
   const end = Date.now();
   console.log(`Duration: ${(end - start) / 1000.0}s`);
-  console.log(response);
+  console.log(response.usage);
 
-  return res.status(200).json(response);
+  return res.status(200).json(JSON.parse(response.output_text || "{}"));
 }
 
 export async function createExpenseController(req: Request, res: Response) {

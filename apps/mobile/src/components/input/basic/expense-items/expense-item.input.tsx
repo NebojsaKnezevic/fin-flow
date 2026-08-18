@@ -221,19 +221,48 @@ export default function ExpenseItems() {
                         const categoryObj = (categories.data || []).find(
                           (c) => c.id === catId,
                         );
+
                         if (!categoryObj) return null;
 
                         return (
-                          <Chip
-                            key={catId}
-                            compact
-                            icon="tag"
-                            style={styles.chip}
-                            textStyle={styles.chipText}
-                            onClose={() => toggleCategory(catId, item, i)}
-                          >
-                            {categoryObj.category}
-                          </Chip>
+                          <>
+                            {item.newCategory ? (
+                              <>
+                                <Chip
+                                  key={catId}
+                                  compact
+                                  icon="tag"
+                                  style={styles.chip}
+                                  textStyle={styles.chipText}
+                                  onClose={() => toggleCategory(catId, item, i)}
+                                >
+                                  {categoryObj.category}
+                                </Chip>
+                                {/* Dodati komponentu za handle novih kategorija */}
+                                <Chip
+                                  key={catId + "child"}
+                                  compact
+                                  icon="tag"
+                                  style={styles.chip}
+                                  textStyle={styles.chipText}
+                                  onClose={() => toggleCategory(catId, item, i)}
+                                >
+                                  {item.newCategory.category}
+                                </Chip>
+                              </>
+                            ) : (
+                              <Chip
+                                key={catId}
+                                compact
+                                icon="tag"
+                                style={styles.chip}
+                                textStyle={styles.chipText}
+                                onClose={() => toggleCategory(catId, item, i)}
+                              >
+                                {categoryObj.category}
+                              </Chip>
+                            )}
+                          </>
                         );
                       })}
                     </View>

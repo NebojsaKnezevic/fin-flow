@@ -1,22 +1,57 @@
-import { JSX } from "react";
+import { JSX, useState } from "react";
 import { StyleSheet, View, Platform } from "react-native";
 import {
   TextInput,
   ActivityIndicator,
   Text,
   useTheme,
+  Modal,
+  Portal,
+  IconButton,
 } from "react-native-paper";
 import { useExpenseStore } from "../../../../store/expense.store";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useCreateExpenseAI } from "../../../../hooks/mutations/useExpense";
+import { Notify } from "../../../../helpers/toast.helper";
+import {
+  aiExpenseExtractionSchema,
+  transformAiResponseToExpense,
+} from "@repo/models";
+import ExpenseCamera from "./camera.ai";
 
 export default function ExpenseAI(): JSX.Element {
+  const [isCameraVisible, setIsCameraVisible] = useState(false);
+  const imgBase64 = useExpenseStore((s) => s.imageBase64);
+
   const isLoading = useExpenseStore((s) => s.isLoading);
   const text = useExpenseStore((s) => s.aiTextInput);
   const setText = useExpenseStore((s) => s.setAiTextInput);
+  const setExpense = useExpenseStore((s) => s.setExpanse);
   const theme = useTheme();
 
-  const sendAiInput = useCreateExpenseAI();
+  const { mutate: createExpenseAI, isPending } = useCreateExpenseAI();
+
+  const handleAiSubmit = (promptText: string) => {
+    createExpenseAI(
+      { prompt: promptText, imageBase64: imgBase64 },
+      {
+        onSuccess: (responseData) => {
+          const parsed = aiExpenseExtractionSchema.safeParse(responseData);
+
+          if (!parsed.success) {
+            console.error("Zod Schema Error:", parsed.error.format());
+            Notify.error("AI returned invalid expense structure");
+            return;
+          }
+          // console.log(parsed.data);
+          // Ubacivanje validiranih podataka u Zustand store
+          setExpense(transformAiResponseToExpense(parsed.data));
+          Notify.success("Expense populated from AI!");
+          // console.log("imgBase64: ", imgBase64);
+        },
+      },
+    );
+  };
 
   return (
     <View
@@ -55,23 +90,49 @@ export default function ExpenseAI(): JSX.Element {
           disabled={isLoading}
           style={styles.input}
           outlineStyle={styles.outline}
+          left={
+            <TextInput.Icon
+              icon="camera"
+              onPress={() => setIsCameraVisible(true)}
+            />
+          }
           right={
             <TextInput.Icon
               icon="send"
               disabled={!text.trim() || isLoading}
               onPress={() => {
-                sendAiInput.mutate(text, {
-                  onSuccess: () => setText(""),
-                });
+                handleAiSubmit(text);
               }}
               color={
-                text.trim() && !sendAiInput.isPending
+                text.trim() && !isPending
                   ? theme.colors.primary
                   : theme.colors.outline
               }
             />
           }
         />
+
+        {/* PAPER PORTAL + MODAL FOR CAMERA */}
+        <Portal>
+          <Modal
+            visible={isCameraVisible}
+            onDismiss={() => setIsCameraVisible(false)}
+            contentContainerStyle={styles.modalContent}
+          >
+            <View style={styles.cameraWrapper}>
+              <IconButton
+                icon="close"
+                iconColor="#fff"
+                size={28}
+                style={styles.closeButton}
+                onPress={() => setIsCameraVisible(false)}
+              />
+
+              {/* CAMERA View */}
+              <ExpenseCamera onClose={() => setIsCameraVisible(false)} />
+            </View>
+          </Modal>
+        </Portal>
       </View>
     </View>
   );
@@ -106,5 +167,21 @@ const styles = StyleSheet.create({
   },
   outline: {
     borderRadius: 16,
+  },
+  modalContent: {
+    flex: 1,
+    backgroundColor: "#000",
+    margin: 0, // Za prikaz preko celog ekrana
+  },
+  cameraWrapper: {
+    flex: 1,
+    position: "relative",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 20,
+    backgroundColor: "rgba(0,0,0,0.4)",
   },
 });

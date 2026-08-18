@@ -34,8 +34,26 @@ export default function InputScreen() {
         {/* <Text variant="headlineLarge">Welcome back! </Text> */}
 
         {/* <ExpenseList /> */}
-        {value.toLowerCase() === "basic" && <Expense />}
-        {value.toLowerCase() === "ai" && <ExpenseAI />}
+        {/* {value.toLowerCase() === "basic" && <Expense />}
+        {value.toLowerCase() === "ai" && <ExpenseAI />} */}
+        <View style={styles.content}>
+          <View
+            style={{
+              display: value.toLowerCase() === "basic" ? "flex" : "none",
+              flex: 1,
+            }}
+          >
+            <Expense />
+          </View>
+          <View
+            style={{
+              display: value.toLowerCase() === "ai" ? "flex" : "none",
+              flex: 1,
+            }}
+          >
+            <ExpenseAI />
+          </View>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -54,7 +72,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // justifyContent: "flex-start",
     // alignItems: "stretch",
-    paddingHorizontal: 20,
+    paddingHorizontal: 2,
     gap: 15,
   },
   title: {

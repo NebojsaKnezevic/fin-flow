@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../client/client";
-import { InsertExpense, InsertExpenseExtended } from "@api/schema";
-import { ExpenseItemObj } from "../../store/expense.store";
+import { InsertExpense, InsertExpenseExtended } from "@repo/models";
+// import { ExpenseItemObj } from "../../store/expense.store";
 import { Notify } from "../../helpers/toast.helper";
 // import { expenseApi } from '../../api/expense.api';
 
@@ -24,18 +24,23 @@ export const useCreateExpense = () => {
   });
 };
 
-export const useCreateExpenseAI = () => {
-  const queryClient = useQueryClient();
+interface CreateExpenseAiPayload {
+  prompt?: string;
+  imageBase64?: string;
+}
 
+export const useCreateExpenseAI = () => {
   return useMutation({
-    mutationFn: (inputAi: string) => {
-      return apiClient.post("/expenses/createExpenseAI", { prompt: inputAi });
-    },
-    onSuccess: (d) => {
-      Notify.success("Success createExpenseAI!", JSON.stringify(d));
+    mutationFn: async ({ prompt, imageBase64 }: CreateExpenseAiPayload) => {
+      const res = await apiClient.post("/expenses/createExpenseAI", {
+        prompt: prompt,
+        image: imageBase64,
+      });
+      return res.data;
     },
     onError: (error) => {
-      console.error("Error during expense creation: ", error);
+      console.error("Error during expense AI creation: ", error);
+      Notify.error("Failed to generate expense via AI");
     },
   });
 };

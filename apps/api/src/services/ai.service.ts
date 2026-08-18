@@ -1,12 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
-import { getJsonSchema, insertExpenseExtendedSchema } from "@repo/models";
-// import { fstat } from "fs";
+import { getJsonSchema } from "@repo/models";
 import { readFile } from "fs/promises";
 import path from "path";
-import { categoryService } from "./expense.service";
 import { AppError } from "../errors/app.error";
-import type { ZodJSONSchema, ZodObject, ZodSchema, ZodType } from "zod";
-// import type { ExpenseItemObj } from "@finflow/expense-store";
 
 export class AIService {
   private ai = new GoogleGenAI({});
@@ -15,18 +11,17 @@ export class AIService {
     model: string;
     prompt: string;
     schema: any;
-    imgPath?: string;
+    // imgPath?: string;
+    img?: string;
+    imgMime?: string;
   }) {
     const inputData: any[] = [{ type: "text", text: options.prompt }];
 
-    if (options.imgPath) {
-      const extn = path.extname(options.imgPath).toLowerCase().replace(".", "");
-      const image = await readFile(options.imgPath);
-
+    if (options.img && options.imgMime) {
       inputData.push({
         type: "image",
-        data: image.toString("base64"),
-        mime_type: extn === "jpg" ? "image/jpeg" : `image/${extn}`,
+        data: options.img,
+        mime_type: options.imgMime,
       });
     }
 
@@ -42,8 +37,8 @@ export class AIService {
       },
     });
 
-    // const rawText = response.output_text || "{}";
-    // console.log(rawText);
+    const rawText = response.output_text || "{}";
+    console.log(rawText);
     // return options.schema.parse(JSON.parse(rawText));
     return response;
   }

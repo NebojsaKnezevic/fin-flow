@@ -176,3 +176,111 @@ export const expenseItemsCategories = pgTable(
     pk: primaryKey({ columns: [table.itemId, table.categoryId] }),
   }),
 );
+
+export const aiExpenseExtractionSchema = baseExpenseSchema
+  .omit({
+    userId: true,
+    source: true,
+  })
+  .extend({
+    name: z
+      .string()
+      .default("Expense")
+      .describe(
+        "Short overview name or title of the receipt (e.g. 'Metro Purchase', 'Lidl Groceries').",
+      ),
+    merchant: z
+      .string()
+      .nullable()
+      .describe(
+        "Store or merchant name extracted from the top header of the receipt (e.g., 'Metro Cash & Carry', 'Lidl', 'Maxi'). MUST be populated if visible.",
+      ),
+    totalAmount: z.number().describe("The total sum paid on the receipt."),
+    currency: z
+      .string()
+      .default("RSD")
+      .describe("3-letter currency code, e.g., RSD, EUR, USD."),
+    occuredAt: z
+      .string()
+      .describe(
+        "Transaction date in YYYY-MM-DD format (or ISO string) from the receipt.",
+      ),
+    expenseItemList: z
+      .array(
+        z.object({
+          price: z.number().describe("Price of the single item or line total."),
+          quantity: z
+            .number()
+            .default(1)
+            .describe("Quantity of the item purchased."),
+          categories: z
+            .array(z.number())
+            .describe(
+              "Array of EXISTING category IDs matching this item. It has to have atleast 1 category id.",
+            ),
+          newCategory: z
+            .object({
+              category: z
+                .string()
+                .describe("Name of the new category to create."),
+              parentId: z
+                .number()
+                .nullable()
+                .optional()
+                .describe("ID of an existing parent category if applicable."),
+            })
+            .nullable()
+            .describe(
+              "If no existing category in 'categories' fits, populate this object with the new category name.",
+            ),
+        }),
+      )
+      .min(1, "Receipt must contain at least 1 item"),
+  });
+
+export function transformAiResponseToExpense(
+  rawAiData: unknown,
+  userId: string = "00000000-0000-0000-0000-000000000000",
+): InsertExpenseExtended {
+  const parsed = aiExpenseExtractionSchema.parse(rawAiData);
+
+  const dateParsed = new Date(parsed.occuredAt);
+  const validDate = isNaN(dateParsed.getTime()) ? new Date() : dateParsed;
+
+  const result = {
+    name: parsed.name || "Expense",
+    userId: userId,
+    source: "ai" as const,
+    merchant: parsed.merchant ?? null,
+    totalAmount: Number(parsed.totalAmount),
+    currency: parsed.currency || "RSD",
+
+    occuredAt: validDate,
+
+    expenseItemList: parsed.expenseItemList.map((item) => ({
+      price: item.price.toString(),
+      quantity: item.quantity.toString(),
+      categories: item.categories || [],
+      newCategory: item.newCategory
+        ? {
+            category: item.newCategory.category,
+            parentId: item.newCategory.parentId ?? null,
+          }
+        : null,
+    })),
+  };
+
+  const validation = insertExpenseExtendedSchema.safeParse(result);
+
+  if (!validation.success) {
+    console.error(
+      "ZOD VALIDATION FAILED DETAILS:",
+      JSON.stringify(validation.error.format(), null, 2),
+    );
+    throw new Error("Failed to validate expense schema");
+  }
+
+  console.log(validation.data);
+
+  return validation.data;
+}
