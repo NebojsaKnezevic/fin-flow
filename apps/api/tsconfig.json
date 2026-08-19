@@ -11,5 +11,5 @@
       "@finflow/expense-store": ["../mobile/store/expense.store.ts"]
     }
   },
-  "include": ["src/**/*", "src/services/**/*", "helpers/**/*", "drizzle/**/*"]
+  "include": ["src/**/*", "src/services/**/*", "src/helpers/**/*", "drizzle/**/*"]
 }
