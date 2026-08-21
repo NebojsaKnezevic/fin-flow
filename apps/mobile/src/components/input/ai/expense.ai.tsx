@@ -1,5 +1,5 @@
 import { JSX, useState } from "react";
-import { StyleSheet, View, Platform } from "react-native";
+import { StyleSheet, View, Platform, ScrollView } from "react-native";
 import {
   TextInput,
   ActivityIndicator,
@@ -34,6 +34,12 @@ export default function ExpenseAI(): JSX.Element {
 
   const { mutate: createExpenseAI, isPending } = useCreateExpenseAI();
 
+  // ==========================================================
+  //                          VAZNO
+  // ==========================================================
+  // Treba namestiti da mogu da slikam vise slika bez prekida i da se to sacuva lepo na FE.
+  // Onda treba refaktorisati BE da prihvati taj niz slika.
+
   const handleAiSubmit = (promptText: string) => {
     createExpenseAI(
       { prompt: promptText, imageBase64: imgBase64 },
@@ -62,9 +68,16 @@ export default function ExpenseAI(): JSX.Element {
       //   behavior={Platform.OS === "ios" ? "padding" : "height"}
       //   keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
-      <Text style={{ color: "white", marginTop: 160 }}>{text}</Text>
+      <Text style={{ color: "white", marginTop: 20 }}>{text}</Text>
 
-      <View style={styles.imgSection}>
+      <ScrollView
+        indicatorStyle="white"
+        style={styles.imgSection}
+        contentContainerStyle={styles.imgSectionContent}
+        showsVerticalScrollIndicator={true}
+      >
+        <ImageBanner />
+        {/* <ImageBanner />
         <ImageBanner />
         <ImageBanner />
         <ImageBanner />
@@ -74,14 +87,13 @@ export default function ExpenseAI(): JSX.Element {
         <ImageBanner />
         <ImageBanner />
         <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-      </View>
+        <ImageBanner /> */}
+      </ScrollView>
 
       {/* LOADER */}
-      <View style={styles.contentContainer}>
-        {isLoading && (
+
+      {isLoading && (
+        <View style={styles.contentContainer}>
           <View style={styles.loadingWrapper}>
             <ActivityIndicator
               animating={true}
@@ -95,8 +107,8 @@ export default function ExpenseAI(): JSX.Element {
               Parsing your expenses...
             </Text>
           </View>
-        )}
-      </View>
+        </View>
+      )}
 
       {/* INPUT */}
       <View style={styles.inputWrapper}>
@@ -136,7 +148,7 @@ export default function ExpenseAI(): JSX.Element {
             />
           }
         />
-
+        showsVerticalScrollIndicator={true}
         {/* PAPER PORTAL + MODAL FOR CAMERA */}
         <Portal>
           <Modal
@@ -171,9 +183,10 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     justifyContent: "space-between",
+    height: "auto",
   },
   contentContainer: {
-    flex: 1,
+    flex: 0.1,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -219,10 +232,14 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.4)",
   },
   imgSection: {
+    flex: 1,
+    width: "100%",
+  },
+  imgSectionContent: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     rowGap: 12,
-    width: "100%",
+    paddingVertical: 10,
   },
 });
