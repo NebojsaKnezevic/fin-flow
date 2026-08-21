@@ -18,8 +18,11 @@ import {
   transformAiResponseToExpense,
 } from "@repo/models";
 import ExpenseCamera from "./camera.ai";
+import ImageBanner from "./banner.ai";
 
 export default function ExpenseAI(): JSX.Element {
+  const [isFocused, setIsFocused] = useState(false);
+
   const [isCameraVisible, setIsCameraVisible] = useState(false);
   const imgBase64 = useExpenseStore((s) => s.imageBase64);
 
@@ -59,7 +62,23 @@ export default function ExpenseAI(): JSX.Element {
       //   behavior={Platform.OS === "ios" ? "padding" : "height"}
       //   keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
-      <Text style={{ color: "white", marginTop: 150 }}>{text}</Text>
+      <Text style={{ color: "white", marginTop: 160 }}>{text}</Text>
+
+      <View style={styles.imgSection}>
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+        <ImageBanner />
+      </View>
+
       {/* LOADER */}
       <View style={styles.contentContainer}>
         {isLoading && (
@@ -83,13 +102,19 @@ export default function ExpenseAI(): JSX.Element {
       <View style={styles.inputWrapper}>
         <TextInput
           mode="outlined"
-          placeholder="Tell me your expenses..."
+          placeholder={isFocused ? "" : "Tell me your expenses..."}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          // placeholder="Tell me your expenses..."
           value={text}
           onChangeText={setText}
           multiline
           disabled={isLoading}
           style={styles.input}
+          contentStyle={styles.inputContent}
           outlineStyle={styles.outline}
+          textAlign="center"
+          verticalAlign="middle"
           left={
             <TextInput.Icon
               icon="camera"
@@ -159,14 +184,23 @@ const styles = StyleSheet.create({
   inputWrapper: {
     width: "100%",
     justifyContent: "flex-end",
+    alignContent: "center",
   },
   input: {
     maxHeight: 160,
-    minHeight: 46,
+    minHeight: 56,
     width: "100%",
+  },
+  inputContent: {
+    textAlignVertical: "center",
+    justifyContent: "center",
+    paddingTop: Platform.OS === "ios" ? 14 : 0,
+    paddingBottom: 0,
   },
   outline: {
     borderRadius: 16,
+
+    // backgroundColor: "red",
   },
   modalContent: {
     flex: 1,
@@ -183,5 +217,12 @@ const styles = StyleSheet.create({
     right: 20,
     zIndex: 20,
     backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  imgSection: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    rowGap: 12,
+    width: "100%",
   },
 });
