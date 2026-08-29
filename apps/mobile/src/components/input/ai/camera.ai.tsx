@@ -25,7 +25,7 @@ export default function ExpenseCamera({ onClose }: ExpenseCameraProps) {
 
   const onPictureTaken = (img: string) => {
     setImage(img);
-    onClose?.();
+    // onClose?.();
   };
 
   if (!permission.granted) {

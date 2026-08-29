@@ -26,7 +26,7 @@ import { useCreateExpense } from "../../../../hooks/mutations/useExpense";
 export default function Expense() {
   const theme: AppTheme = useTheme();
   const newExpense: InsertExpenseExtended = useExpenseStore((s) => s.expense);
-  const setNewExpense = useExpenseStore((s) => s.setExpanse);
+  const setNewExpense = useExpenseStore((s) => s.setExpense);
   const expenseItems: InsertExpenseItemExtended[] = useExpenseStore(
     (s) => s.expense.expenseItemList,
   );

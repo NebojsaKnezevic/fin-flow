@@ -27,9 +27,10 @@ export default function ExpenseAI(): JSX.Element {
   const imgBase64 = useExpenseStore((s) => s.imageBase64);
 
   const isLoading = useExpenseStore((s) => s.isLoading);
+  const setLoading = useExpenseStore((s) => s.setIsLoading);
   const text = useExpenseStore((s) => s.aiTextInput);
   const setText = useExpenseStore((s) => s.setAiTextInput);
-  const setExpense = useExpenseStore((s) => s.setExpanse);
+  const setExpense = useExpenseStore((s) => s.setExpense);
   const theme = useTheme();
 
   const { mutate: createExpenseAI, isPending } = useCreateExpenseAI();
@@ -41,22 +42,32 @@ export default function ExpenseAI(): JSX.Element {
   // Onda treba refaktorisati BE da prihvati taj niz slika.
 
   const handleAiSubmit = (promptText: string) => {
+    setLoading(true);
+
     createExpenseAI(
-      { prompt: promptText, imageBase64: imgBase64 },
+      {
+        prompt: promptText,
+        imageBase64: imgBase64.length > 0 ? imgBase64[0].img : "",
+      },
       {
         onSuccess: (responseData) => {
           const parsed = aiExpenseExtractionSchema.safeParse(responseData);
 
           if (!parsed.success) {
-            console.error("Zod Schema Error:", parsed.error.format());
+            // console.error("Zod Schema Error:", parsed.error.format());
             Notify.error("AI returned invalid expense structure");
             return;
           }
-          // console.log(parsed.data);
-          // Ubacivanje validiranih podataka u Zustand store
+
           setExpense(transformAiResponseToExpense(parsed.data));
           Notify.success("Expense populated from AI!");
-          // console.log("imgBase64: ", imgBase64);
+        },
+        onError: (error) => {
+          console.error("AI Request Error:", error);
+          Notify.error("Failed to process AI request");
+        },
+        onSettled: () => {
+          setLoading(false);
         },
       },
     );
@@ -65,7 +76,7 @@ export default function ExpenseAI(): JSX.Element {
   return (
     <View
       style={styles.inner}
-      //   behavior={Platform.OS === "ios" ? "padding" : "height"}
+      // behavior={Platform.OS === "ios" ? "padding" : "height"}
       //   keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
       <Text style={{ color: "white", marginTop: 20 }}>{text}</Text>
@@ -76,18 +87,14 @@ export default function ExpenseAI(): JSX.Element {
         contentContainerStyle={styles.imgSectionContent}
         showsVerticalScrollIndicator={true}
       >
-        <ImageBanner />
-        {/* <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-        <ImageBanner />
-        <ImageBanner /> */}
+        {imgBase64.length > 0 &&
+          imgBase64.map((img, i) => (
+            <ImageBanner
+              imageBase64={img.img}
+              index={i}
+              isSelected={img.isSelected}
+            />
+          ))}
       </ScrollView>
 
       {/* LOADER */}
@@ -186,9 +193,15 @@ const styles = StyleSheet.create({
     height: "auto",
   },
   contentContainer: {
-    flex: 0.1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1000,
   },
   loadingWrapper: {
     alignItems: "center",

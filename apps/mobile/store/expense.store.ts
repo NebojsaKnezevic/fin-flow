@@ -10,9 +10,8 @@ import { create } from "zustand";
 
 interface ExpenseState {
   expense: InsertExpenseExtended;
-  // expenseItems: InsertExpenseItemExtended[];
   isValid: boolean;
-  setExpanse: (e: InsertExpenseExtended) => void;
+  setExpense: (e: InsertExpenseExtended) => void;
   addExpenseItem: (ei: InsertExpenseItemExtended) => void;
   removeExpenseItem: (index: number) => void;
   updateExpenseItem: (index: number, item: InsertExpenseItemExtended) => void;
@@ -22,8 +21,11 @@ interface ExpenseState {
   setAiTextInput: (s: string) => void;
   isLoading: boolean;
   setIsLoading: (b: boolean) => void;
-  imageBase64?: string;
+
+  imageBase64: { img: string; isSelected: boolean }[];
   setImage64: (bi64: string) => void;
+  removeImage64: (i: number) => void;
+  selectImage64: (i: number) => void;
 }
 
 export const defaultExpense: InsertExpenseExtended = {
@@ -45,50 +47,63 @@ export const defaultExpense: InsertExpenseExtended = {
   ],
 };
 
-export const useExpenseStore = create<ExpenseState>((set) => {
-  return {
-    expense: defaultExpense,
-    // expenseItems: [],
-    isValid: false,
+export const useExpenseStore = create<ExpenseState>((set) => ({
+  expense: defaultExpense,
+  isValid: false,
 
-    setExpanse: (e: InsertExpenseExtended) => set({ expense: e }),
+  setExpense: (e: InsertExpenseExtended) => set({ expense: e }),
 
-    addExpenseItem: (ei: InsertExpenseItemExtended) =>
-      set((state) => ({
-        expense: {
-          ...state.expense,
-          expenseItemList: [...state.expense.expenseItemList, ei],
-        },
-      })),
+  addExpenseItem: (ei: InsertExpenseItemExtended) =>
+    set((state) => ({
+      expense: {
+        ...state.expense,
+        expenseItemList: [...state.expense.expenseItemList, ei],
+      },
+    })),
 
-    removeExpenseItem: (index: number) =>
-      set((state) => ({
-        expense: {
-          ...state.expense,
-          expenseItemList: state.expense.expenseItemList.filter(
-            (_, i) => i !== index,
-          ),
-        },
-      })),
+  removeExpenseItem: (index: number) =>
+    set((state) => ({
+      expense: {
+        ...state.expense,
+        expenseItemList: state.expense.expenseItemList.filter(
+          (_, i) => i !== index,
+        ),
+      },
+    })),
 
-    updateExpenseItem: (index: number, item: InsertExpenseItemExtended) =>
-      set((state) => ({
-        expense: {
-          ...state.expense,
-          expenseItemList: state.expense.expenseItemList.map((oldItem, i) =>
-            i === index ? item : oldItem,
-          ),
-        },
-      })),
+  updateExpenseItem: (index: number, item: InsertExpenseItemExtended) =>
+    set((state) => ({
+      expense: {
+        ...state.expense,
+        expenseItemList: state.expense.expenseItemList.map((oldItem, i) =>
+          i === index ? item : oldItem,
+        ),
+      },
+    })),
 
-    setValid: (x: boolean) => set({ isValid: x }),
+  setValid: (x: boolean) => set({ isValid: x }),
 
-    aiTextInput: "",
-    setAiTextInput: (s: string) => set({ aiTextInput: s }),
-    isLoading: false,
-    setIsLoading: (b: boolean) => set({ isLoading: b }),
+  aiTextInput: "",
+  setAiTextInput: (s: string) => set({ aiTextInput: s }),
+  isLoading: false,
+  setIsLoading: (b: boolean) => set({ isLoading: b }),
 
-    aiImage64: "",
-    setImage64: (bi64: string) => set({ imageBase64: bi64 }),
-  };
-});
+  imageBase64: [],
+  setImage64: (bi64: string) =>
+    set((state) => ({
+      imageBase64: [...state.imageBase64, { img: bi64, isSelected: true }],
+    })),
+
+  removeImage64: (i: number) =>
+    set((state) => ({
+      imageBase64: state.imageBase64.filter((_, index) => index !== i),
+    })),
+
+  selectImage64: (i: number) =>
+    set((state) => ({
+      imageBase64: state.imageBase64.map((img, index) => {
+        if (i === index) return { ...img, isSelected: !img.isSelected };
+        return img;
+      }),
+    })),
+}));
