@@ -8,9 +8,9 @@ import {
   Modal,
   Portal,
   IconButton,
+  SegmentedButtons,
 } from "react-native-paper";
 import { useExpenseStore } from "../../../../store/expense.store";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useCreateExpenseAI } from "../../../../hooks/mutations/useExpense";
 import { Notify } from "../../../../helpers/toast.helper";
 import {
@@ -22,10 +22,9 @@ import ImageBanner from "./banner.ai";
 
 export default function ExpenseAI(): JSX.Element {
   const [isFocused, setIsFocused] = useState(false);
-
   const [isCameraVisible, setIsCameraVisible] = useState(false);
-  const imgBase64 = useExpenseStore((s) => s.imageBase64);
 
+  const imgBase64 = useExpenseStore((s) => s.imageBase64);
   const isLoading = useExpenseStore((s) => s.isLoading);
   const setLoading = useExpenseStore((s) => s.setIsLoading);
   const text = useExpenseStore((s) => s.aiTextInput);
@@ -35,11 +34,8 @@ export default function ExpenseAI(): JSX.Element {
 
   const { mutate: createExpenseAI, isPending } = useCreateExpenseAI();
 
-  // ==========================================================
-  //                          VAZNO
-  // ==========================================================
-  // Treba namestiti da mogu da slikam vise slika bez prekida i da se to sacuva lepo na FE.
-  // Onda treba refaktorisati BE da prihvati taj niz slika.
+  const isMultipleExpenses = useExpenseStore((s) => s.isMultipleExpenses);
+  const setIsMultipleExpenses = useExpenseStore((s) => s.setIsMultipleExpenses);
 
   const handleAiSubmit = (promptText: string) => {
     setLoading(true);
@@ -47,14 +43,17 @@ export default function ExpenseAI(): JSX.Element {
     createExpenseAI(
       {
         prompt: promptText,
-        imageBase64: imgBase64.length > 0 ? imgBase64[0].img : "",
+        imageBase64:
+          imgBase64.length > 0
+            ? imgBase64.filter((x) => x.isSelected).map((x) => x.img)
+            : [],
+        isMultiple: isMultipleExpenses,
       },
       {
         onSuccess: (responseData) => {
           const parsed = aiExpenseExtractionSchema.safeParse(responseData);
 
           if (!parsed.success) {
-            // console.error("Zod Schema Error:", parsed.error.format());
             Notify.error("AI returned invalid expense structure");
             return;
           }
@@ -74,13 +73,8 @@ export default function ExpenseAI(): JSX.Element {
   };
 
   return (
-    <View
-      style={styles.inner}
-      // behavior={Platform.OS === "ios" ? "padding" : "height"}
-      //   keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-    >
-      <Text style={{ color: "white", marginTop: 20 }}>{text}</Text>
-
+    <View style={styles.container}>
+      {/* SELEKCIJA SLIKA */}
       <ScrollView
         indicatorStyle="white"
         style={styles.imgSection}
@@ -90,6 +84,7 @@ export default function ExpenseAI(): JSX.Element {
         {imgBase64.length > 0 &&
           imgBase64.map((img, i) => (
             <ImageBanner
+              key={i}
               imageBase64={img.img}
               index={i}
               isSelected={img.isSelected}
@@ -97,8 +92,7 @@ export default function ExpenseAI(): JSX.Element {
           ))}
       </ScrollView>
 
-      {/* LOADER */}
-
+      {/* LOADER OVERLAY */}
       {isLoading && (
         <View style={styles.contentContainer}>
           <View style={styles.loadingWrapper}>
@@ -117,6 +111,28 @@ export default function ExpenseAI(): JSX.Element {
         </View>
       )}
 
+      {/* SINGLE / MULTIPLE MODE TOGGLE (DESNO PORAVNATO) */}
+      <View style={styles.modeContainer}>
+        <SegmentedButtons
+          density="high"
+          value={isMultipleExpenses ? "multiple" : "single"}
+          onValueChange={(val) => setIsMultipleExpenses(val === "multiple")}
+          buttons={[
+            {
+              value: "single",
+              label: "Single",
+              icon: "file-document-outline",
+            },
+            {
+              value: "multiple",
+              label: "Multiple",
+              icon: "file-multiple-outline",
+            },
+          ]}
+          style={styles.segmentedButton}
+        />
+      </View>
+
       {/* INPUT */}
       <View style={styles.inputWrapper}>
         <TextInput
@@ -124,7 +140,6 @@ export default function ExpenseAI(): JSX.Element {
           placeholder={isFocused ? "" : "Tell me your expenses..."}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          // placeholder="Tell me your expenses..."
           value={text}
           onChangeText={setText}
           multiline
@@ -143,19 +158,17 @@ export default function ExpenseAI(): JSX.Element {
           right={
             <TextInput.Icon
               icon="send"
-              disabled={!text.trim() || isLoading}
-              onPress={() => {
-                handleAiSubmit(text);
-              }}
+              disabled={(!text.trim() && imgBase64.length === 0) || isLoading}
+              onPress={() => handleAiSubmit(text)}
               color={
-                text.trim() && !isPending
+                (text.trim() || imgBase64.length > 0) && !isPending
                   ? theme.colors.primary
                   : theme.colors.outline
               }
             />
           }
         />
-        showsVerticalScrollIndicator={true}
+
         {/* PAPER PORTAL + MODAL FOR CAMERA */}
         <Portal>
           <Modal
@@ -172,7 +185,6 @@ export default function ExpenseAI(): JSX.Element {
                 onPress={() => setIsCameraVisible(false)}
               />
 
-              {/* CAMERA View */}
               <ExpenseCamera onClose={() => setIsCameraVisible(false)} />
             </View>
           </Modal>
@@ -185,12 +197,18 @@ export default function ExpenseAI(): JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  inner: {
-    flex: 1,
     padding: 16,
     justifyContent: "space-between",
-    height: "auto",
+  },
+  modeContainer: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginVertical: 8,
+  },
+  segmentedButton: {
+    alignSelf: "flex-end",
   },
   contentContainer: {
     position: "absolute",
@@ -225,13 +243,11 @@ const styles = StyleSheet.create({
   },
   outline: {
     borderRadius: 16,
-
-    // backgroundColor: "red",
   },
   modalContent: {
     flex: 1,
     backgroundColor: "#000",
-    margin: 0, // Za prikaz preko celog ekrana
+    margin: 0,
   },
   cameraWrapper: {
     flex: 1,

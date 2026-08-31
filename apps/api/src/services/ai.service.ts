@@ -12,17 +12,20 @@ export class AIService {
     prompt: string;
     schema: any;
     // imgPath?: string;
-    img?: string;
+    img: string[];
     imgMime?: string;
   }) {
     const inputData: any[] = [{ type: "text", text: options.prompt }];
 
-    if (options.img && options.imgMime) {
-      inputData.push({
-        type: "image",
-        data: options.img,
-        mime_type: options.imgMime,
-      });
+    if (options.img.length > 0 && options.imgMime) {
+      // console.log("bingo");
+      for (let i = 0; i < options.img.length; i++) {
+        inputData.push({
+          type: "image",
+          data: options.img[i],
+          mime_type: options.imgMime,
+        });
+      }
     }
 
     const response = await this.ai.interactions.create({

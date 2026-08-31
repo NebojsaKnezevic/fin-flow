@@ -26,15 +26,21 @@ export const useCreateExpense = () => {
 
 interface CreateExpenseAiPayload {
   prompt?: string;
-  imageBase64?: string;
+  imageBase64: string[];
+  isMultiple: boolean;
 }
 
 export const useCreateExpenseAI = () => {
   return useMutation({
-    mutationFn: async ({ prompt, imageBase64 }: CreateExpenseAiPayload) => {
+    mutationFn: async ({
+      prompt,
+      imageBase64,
+      isMultiple,
+    }: CreateExpenseAiPayload) => {
       const res = await apiClient.post("/expenses/createExpenseAI", {
         prompt: prompt,
         image: imageBase64,
+        isMultiple: isMultiple,
       });
       return res.data;
     },

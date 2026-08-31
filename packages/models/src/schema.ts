@@ -63,7 +63,7 @@ export function transformAiResponseToExpense(
     throw new Error("Failed to validate expense schema");
   }
 
-  console.log(validation.data);
+  // console.log(validation.data);
 
   return validation.data;
 }
@@ -192,3 +192,12 @@ export const aiExpenseExtractionSchema = baseExpenseSchema
       )
       .min(1, "Receipt must contain at least 1 item"),
   });
+
+//Controllers
+export const AiRequestSchema = z.object({
+  prompt: z.string().optional().default(""),
+  image: z.array(z.string()).optional().default([]),
+  isMultiple: z.boolean().default(false),
+});
+
+export type AiRequestInput = z.infer<typeof AiRequestSchema>;

@@ -9,6 +9,7 @@ import {
   InsertExpenseExtended,
   insertExpenseExtendedSchema,
   aiExpenseExtractionSchema,
+  AiRequestSchema,
 } from "@repo/models";
 import db from "../db/db";
 import { aliasedTable, count, desc, eq, isNull, or, sql } from "drizzle-orm";
@@ -66,63 +67,24 @@ export async function categoryController(req: Request, res: Response) {
   return res.status(200).json(result);
 }
 
-// export async function aiController(req: Request, res: Response) {
-//   const userId = req.user.id;
-//   const prompt = req.body.prompt;
-
-//   res.setHeader("Content-Type", "text/event-stream");
-//   res.setHeader("Cache-Control", "no-cache");
-//   res.setHeader("Connection", "keep-alive");
-//   res.flushHeaders();
-
-//   // const expenseImg = await fs.readFile('/home/nebo/Downloads/black-white-vector-illustration-receipt-template_97886-8.webp')
-//   // const imgBase64 = expenseImg.toString('base64');
-
-//   const responseSSE = expenseService.processExpenseWithAI(
-//     userId,
-//     prompt,
-//     "/home/nebo/Downloads/receipt.webp",
-//   );
-
-//   for await (const event of responseSSE) {
-//     const payload =
-//       typeof event.data === "string" ? event.data : JSON.stringify(event.data);
-//     // console.log(`event: ${event.packet}\n`);
-//     // console.log(`data: ${payload}\n\n`);
-//     console.log(event);
-//     res.write(`event: ${event.packet}\n`);
-//     res.write(`data: ${payload}\n\n`);
-//   }
-
-//   // res.write("SSE end");
-//   res.end();
-//   // console.log(response.output_text);
-//   // console.log(response);
-//   // return res.status(200).json(response);
-// }
-
 export async function aiController(req: Request, res: Response) {
   const userId = req.user.id;
-  const prompt = req.body.prompt;
-  let image = req.body.image;
+  const { prompt, image, isMultiple } = AiRequestSchema.parse(req.body);
 
-  console.log("Image received! Base64 character length:", image.length);
+  // console.log("Image received! Base64 character length:", image.length);
 
   const rawHeader = req.headers["x-image-mime-type"];
   const mimeType = Array.isArray(rawHeader)
     ? rawHeader[0]
     : rawHeader || "image/jpeg";
 
-  const start = Date.now();
+  // const start = Date.now();
 
   const categories = await categoryService.getCategoriesForUser(userId);
 
-  //   const promptExpense = `### TASK 1: GENERAL METADATA EXTRACTION (CRITICAL)
-  // First, carefully read the receipt and extract:
-  // - Merchant/Store Name
-  // - Total Amount
-  // - Currency (e.g., RSD, EUR, USD)
-  // - Transaction Date`;
+  const multipleExpenses = isMultiple
+    ? "RETURN MULTIPLE EXPENSES IF IT MAKES SENSE"
+    : "RETURN ONE BIG SINGLE EXPENSE";
 
   const promptExpenseItems = `You can get all sorts of sources, pure receipts from hand written or user inserted data which will be provided below.
   TASKs: 
@@ -131,10 +93,12 @@ export async function aiController(req: Request, res: Response) {
   -Currently newCategory is an actually name of the expense item. I need them all always.
   CATEGORIES:
   ${JSON.stringify(categories.map((x) => ({ ...x, userId: "" }))).replaceAll(" ", "")}
+  // MUST RETURN ALL IN ONE BIG EXPENSE: ${!isMultiple}
   USER PROMPT:
   ${prompt}
 `;
 
+  // return res.status(200).json({ msg: promptExpenseItems });
   const response = await aiService.analyzePrompt({
     model: "gemini-3.5-flash",
     prompt: promptExpenseItems,
@@ -143,9 +107,9 @@ export async function aiController(req: Request, res: Response) {
     imgMime: mimeType,
   });
 
-  const end = Date.now();
-  console.log(`Duration: ${(end - start) / 1000.0}s`);
-  console.log(response.usage);
+  // const end = Date.now();
+  // console.log(`Duration: ${(end - start) / 1000.0}s`);
+  // console.log(response.usage);
 
   return res.status(200).json(JSON.parse(response.output_text || "{}"));
 }

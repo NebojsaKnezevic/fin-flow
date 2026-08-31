@@ -26,6 +26,9 @@ interface ExpenseState {
   setImage64: (bi64: string) => void;
   removeImage64: (i: number) => void;
   selectImage64: (i: number) => void;
+
+  isMultipleExpenses: boolean;
+  setIsMultipleExpenses: (x: boolean) => void;
 }
 
 export const defaultExpense: InsertExpenseExtended = {
@@ -106,4 +109,7 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
         return img;
       }),
     })),
+
+  isMultipleExpenses: false,
+  setIsMultipleExpenses: (x: boolean) => set({ isMultipleExpenses: x }),
 }));
