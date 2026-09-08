@@ -36,6 +36,9 @@ export const expenseCategory = pgTable("expense_category", {
     (): AnyPgColumn => expenseCategory.id,
     { onDelete: "cascade" },
   ),
+  description: text().default(""),
+  icon: text("icon").default("folder"),
+  color: text("color").default("#FFFFFF"),
 });
 
 export const expenseSourceEnum = pgEnum("expense_source", [

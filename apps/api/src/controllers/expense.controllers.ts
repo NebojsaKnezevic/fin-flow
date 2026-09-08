@@ -96,7 +96,7 @@ export async function aiController(req: Request, res: Response) {
   // MUST RETURN ALL IN ONE BIG EXPENSE: ${!isMultiple}
   USER PROMPT:
   ${prompt}
-`;
+  `;
 
   // return res.status(200).json({ msg: promptExpenseItems });
   const response = await aiService.analyzePrompt({

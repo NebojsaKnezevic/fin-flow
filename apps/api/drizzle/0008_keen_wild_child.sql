@@ -1,0 +1,1 @@
+ALTER TABLE "expense_category" ALTER COLUMN "color" SET DEFAULT '#FFFFFF';
