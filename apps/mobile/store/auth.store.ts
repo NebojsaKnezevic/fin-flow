@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import * as SecureStore from "expo-secure-store";
-import { UserWithId } from "@api/schema";
+import { UserWithId } from "@repo/models";
 
 // interface user {
 //   id: number;

@@ -73,7 +73,7 @@ export default function CustomInputField({
           <>
             <Text style={theme.fontStyles.casual}>{label}</Text>
             <TextInput
-              value={value}
+              value={String(val) || value}
               dense
               error={!!error}
               onChangeText={setData}
@@ -84,7 +84,7 @@ export default function CustomInputField({
           </>
         ) : (
           <TextInput
-            value={val?.toString()}
+            value={String(val) || value}
             label={label}
             error={!!error}
             onChangeText={setData}

@@ -1,57 +1,115 @@
 import {
   InsertExpense,
-  InsertExpenseItem,
-  InsertExpenseCategory,
-} from "@api/schema";
+  InsertExpenseItemExtended,
+  insertExpenseExtendedSchema,
+  InsertExpenseExtended,
+  getJsonSchema,
+  insertExpenseItemExtendedSchema,
+} from "@repo/models";
 import { create } from "zustand";
 
-export type ExpenseItemObj = InsertExpenseItem & {
-  categories: number[];
-};
-
 interface ExpenseState {
-  expense: InsertExpense;
-  expenseItems: ExpenseItemObj[];
+  expense: InsertExpenseExtended;
   isValid: boolean;
-  setExpanse: (e: InsertExpense) => void;
-  addExpenseItem: (ei: ExpenseItemObj) => void;
+  setExpense: (e: InsertExpenseExtended) => void;
+  addExpenseItem: (ei: InsertExpenseItemExtended) => void;
   removeExpenseItem: (index: number) => void;
-  updateExpenseItem: (index: number, item: ExpenseItemObj) => void;
+  updateExpenseItem: (index: number, item: InsertExpenseItemExtended) => void;
   setValid: (x: boolean) => void;
+
+  aiTextInput: string;
+  setAiTextInput: (s: string) => void;
+  isLoading: boolean;
+  setIsLoading: (b: boolean) => void;
+
+  imageBase64: { img: string; isSelected: boolean }[];
+  setImage64: (bi64: string) => void;
+  removeImage64: (i: number) => void;
+  selectImage64: (i: number) => void;
+
+  isMultipleExpenses: boolean;
+  setIsMultipleExpenses: (x: boolean) => void;
 }
 
-export const useExpenseStore = create<ExpenseState>((set) => {
-  return {
-    expense: {
-      // id: "",
-      userId: "",
-
-      source: "basic",
-      isValid: false,
-      note: "",
-      occuredAt: new Date(),
+export const defaultExpense: InsertExpenseExtended = {
+  userId: "",
+  source: "basic",
+  occuredAt: new Date(),
+  totalAmount: 0,
+  currency: "USD",
+  merchant: "",
+  name: "",
+  note: "",
+  expenseItemList: [
+    {
+      price: "0",
+      quantity: "1",
+      categories: [],
+      newCategory: null,
     },
-    expenseItems: [],
-    isValid: false,
+  ],
+};
 
-    setExpanse: (e: InsertExpense) => set({ expense: e }),
+export const useExpenseStore = create<ExpenseState>((set) => ({
+  expense: defaultExpense,
+  isValid: false,
 
-    addExpenseItem: (ei: ExpenseItemObj) =>
-      set((state) => ({ expenseItems: [...state.expenseItems, ei] })),
+  setExpense: (e: InsertExpenseExtended) => set({ expense: e }),
 
-    removeExpenseItem: (index: number) =>
-      set((s) => ({
-        expenseItems: s.expenseItems.filter((_, i) => index !== i),
-      })),
+  addExpenseItem: (ei: InsertExpenseItemExtended) =>
+    set((state) => ({
+      expense: {
+        ...state.expense,
+        expenseItemList: [...state.expense.expenseItemList, ei],
+      },
+    })),
 
-    updateExpenseItem: (index: number, item: ExpenseItemObj) =>
-      set((s) => {
-        s.expenseItems[index] = item;
-        return {
-          expenseItems: [...s.expenseItems],
-        };
+  removeExpenseItem: (index: number) =>
+    set((state) => ({
+      expense: {
+        ...state.expense,
+        expenseItemList: state.expense.expenseItemList.filter(
+          (_, i) => i !== index,
+        ),
+      },
+    })),
+
+  updateExpenseItem: (index: number, item: InsertExpenseItemExtended) =>
+    set((state) => ({
+      expense: {
+        ...state.expense,
+        expenseItemList: state.expense.expenseItemList.map((oldItem, i) =>
+          i === index ? item : oldItem,
+        ),
+      },
+    })),
+
+  setValid: (x: boolean) => set({ isValid: x }),
+
+  aiTextInput: "",
+  setAiTextInput: (s: string) => set({ aiTextInput: s }),
+  isLoading: false,
+  setIsLoading: (b: boolean) => set({ isLoading: b }),
+
+  imageBase64: [],
+  setImage64: (bi64: string) =>
+    set((state) => ({
+      imageBase64: [...state.imageBase64, { img: bi64, isSelected: true }],
+    })),
+
+  removeImage64: (i: number) =>
+    set((state) => ({
+      imageBase64: state.imageBase64.filter((_, index) => index !== i),
+    })),
+
+  selectImage64: (i: number) =>
+    set((state) => ({
+      imageBase64: state.imageBase64.map((img, index) => {
+        if (i === index) return { ...img, isSelected: !img.isSelected };
+        return img;
       }),
+    })),
 
-    setValid: (x: boolean) => set({ isValid: x }),
-  };
-});
+  isMultipleExpenses: false,
+  setIsMultipleExpenses: (x: boolean) => set({ isMultipleExpenses: x }),
+}));

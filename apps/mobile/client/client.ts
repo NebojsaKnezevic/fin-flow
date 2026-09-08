@@ -5,7 +5,7 @@ import * as SecureStore from "expo-secure-store";
 
 export const apiClient = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
-  timeout: 10000,
+  timeout: 155000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -19,6 +19,12 @@ apiClient.interceptors.request.use(
       // Notify.success(JSON.stringify(token));
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      //================ IMAGE MIME TYPE ====================
+      //Expo camera always returns image/jpeg
+      if (config.url?.endsWith("/expenses/createExpenseAI")) {
+        config.headers["X-Image-Mime-Type"] = "image/jpeg";
       }
     } catch (error) {
       Notify.error(

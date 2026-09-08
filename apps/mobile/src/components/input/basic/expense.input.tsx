@@ -8,10 +8,14 @@ import {
 } from "react-native";
 import ExpenseItems from "./expense-items/expense-item.input";
 import {
-  ExpenseItemObj,
+  // ExpenseItemObj,
   useExpenseStore,
 } from "../../../../store/expense.store";
-import { InsertExpense } from "@api/schema";
+import {
+  InsertExpense,
+  InsertExpenseExtended,
+  InsertExpenseItemExtended,
+} from "@repo/models";
 import { Button, Text, TextInput, useTheme } from "react-native-paper";
 import CustomInputField from "./custom-field/custom-field.input";
 import { AppTheme } from "@/app/_layout";
@@ -21,13 +25,15 @@ import { useCreateExpense } from "../../../../hooks/mutations/useExpense";
 
 export default function Expense() {
   const theme: AppTheme = useTheme();
-  const newExpense: InsertExpense = useExpenseStore((s) => s.expense);
-  const setNewExpense = useExpenseStore((s) => s.setExpanse);
-  const expenseItems: ExpenseItemObj[] = useExpenseStore((s) => s.expenseItems);
+  const newExpense: InsertExpenseExtended = useExpenseStore((s) => s.expense);
+  const setNewExpense = useExpenseStore((s) => s.setExpense);
+  const expenseItems: InsertExpenseItemExtended[] = useExpenseStore(
+    (s) => s.expense.expenseItemList,
+  );
 
   const { mutate, isPending } = useCreateExpense();
 
-  const items = useExpenseStore((s) => s.expenseItems);
+  const items = useExpenseStore((s) => s.expense.expenseItemList);
   const isValid = useExpenseStore((s) => s.isValid);
 
   React.useEffect(() => {
@@ -52,11 +58,13 @@ export default function Expense() {
         keyboardShouldPersistTaps="handled"
       >
         {/* <Text>{JSON.stringify(newExpense)}</Text> */}
+
         <CustomInputField
           label="Receipt Name:"
           val={newExpense.name}
           setValue={(val) => setNewExpense({ ...newExpense, name: val })}
         />
+        {/* TO DO - Make this a dropdown */}
         <CustomInputField
           label="Merchant:"
           val={newExpense.merchant}
@@ -72,6 +80,7 @@ export default function Expense() {
           val={newExpense.occuredAt.toLocaleDateString("US")}
         /> */}
 
+        {/* TO DO - More love to this one */}
         <CustomInputField
           label="Occured At:"
           val={newExpense.occuredAt.toLocaleDateString()}
@@ -99,7 +108,7 @@ export default function Expense() {
         />
 
         {/* <QuickDatePicker /> */}
-
+        {/* TO DO - Definetly more love here */}
         <ExpenseItems />
 
         <View
@@ -119,6 +128,7 @@ export default function Expense() {
           </View>
 
           <View style={{ flex: 2 }}>
+            {/* TO DO - Make this a dropdown */}
             <CustomInputField
               customLabel={false}
               label="Currency: "

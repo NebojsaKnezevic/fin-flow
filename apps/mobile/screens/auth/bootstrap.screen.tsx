@@ -7,7 +7,7 @@ import { apiClient } from "../../client/client";
 import * as SecureStore from "expo-secure-store";
 import { Notify } from "../../helpers/toast.helper";
 import { useAuthStore } from "../../store/auth.store";
-import { UserWithId } from "@api/schema";
+import { UserWithId } from "@repo/models";
 import { useRouter } from "expo-router";
 
 export default function AuthBootstrap() {

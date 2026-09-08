@@ -3,7 +3,7 @@ import { registerSchema, loginSchema } from "../schemas/auth.schema";
 import bcrypt from "bcrypt";
 import db from "../db/db";
 import { eq } from "drizzle-orm";
-import { users, UserWithId } from "../db/schemas/schema";
+import { users, UserWithId } from "@repo/models";
 import { AppError } from "../errors/app.error";
 import jwt from "jsonwebtoken";
 

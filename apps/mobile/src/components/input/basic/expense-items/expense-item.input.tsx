@@ -15,14 +15,14 @@ import {
 } from "react-native-paper";
 import { AppTheme } from "@/app/_layout";
 import {
-  ExpenseItemObj,
+  // ExpenseItemObj,
   useExpenseStore,
 } from "../../../../../store/expense.store";
 // import CategoryInput from "./categories/category.input";
 import { apiClient } from "../../../../../client/client";
 import { useQuery } from "@tanstack/react-query";
 import SearchDropDown from "./categories/category.-search.input";
-import { ExpenseCategory } from "@api/schema";
+import { ExpenseCategory, InsertExpenseItemExtended } from "@repo/models";
 import { useCategories } from "../../../../../hooks/queries/useCategories";
 
 function getDescendants(id: number, categories: ExpenseCategory[]): number[] {
@@ -44,7 +44,7 @@ export default function ExpenseItems() {
 
   // if(categories.data)
 
-  const items = useExpenseStore((s) => s.expenseItems);
+  const items = useExpenseStore((s) => s.expense.expenseItemList);
   const addItemInStore = useExpenseStore((s) => s.addExpenseItem);
   const updateItemInStore = useExpenseStore((s) => s.updateExpenseItem);
   const removeItemFromStore = useExpenseStore((s) => s.removeExpenseItem);
@@ -56,12 +56,13 @@ export default function ExpenseItems() {
       price: 0,
       quantity: 1,
       categories: [],
+      newCategory: null,
     });
   };
 
   const toggleCategory = (
     catId: number,
-    item: ExpenseItemObj,
+    item: InsertExpenseItemExtended,
     index: number,
   ) => {
     if (item.categories.includes(catId)) {
@@ -220,19 +221,48 @@ export default function ExpenseItems() {
                         const categoryObj = (categories.data || []).find(
                           (c) => c.id === catId,
                         );
+
                         if (!categoryObj) return null;
 
                         return (
-                          <Chip
-                            key={catId}
-                            compact
-                            icon="tag"
-                            style={styles.chip}
-                            textStyle={styles.chipText}
-                            onClose={() => toggleCategory(catId, item, i)}
-                          >
-                            {categoryObj.category}
-                          </Chip>
+                          <>
+                            {item.newCategory ? (
+                              <>
+                                <Chip
+                                  key={catId}
+                                  compact
+                                  icon="tag"
+                                  style={styles.chip}
+                                  textStyle={styles.chipText}
+                                  onClose={() => toggleCategory(catId, item, i)}
+                                >
+                                  {categoryObj.category}
+                                </Chip>
+                                {/* Dodati komponentu za handle novih kategorija */}
+                                <Chip
+                                  key={catId + "child"}
+                                  compact
+                                  icon="tag"
+                                  style={styles.chip}
+                                  textStyle={styles.chipText}
+                                  onClose={() => toggleCategory(catId, item, i)}
+                                >
+                                  {item.newCategory.category}
+                                </Chip>
+                              </>
+                            ) : (
+                              <Chip
+                                key={catId}
+                                compact
+                                icon="tag"
+                                style={styles.chip}
+                                textStyle={styles.chipText}
+                                onClose={() => toggleCategory(catId, item, i)}
+                              >
+                                {categoryObj.category}
+                              </Chip>
+                            )}
+                          </>
                         );
                       })}
                     </View>

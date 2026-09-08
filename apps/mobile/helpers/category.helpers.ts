@@ -1,4 +1,4 @@
-import { ExpenseCategory } from "@api/schema";
+import { ExpenseCategory } from "@repo/models";
 
 function getDescendantsIds(
   id: number,
